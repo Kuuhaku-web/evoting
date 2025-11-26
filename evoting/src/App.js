@@ -16,7 +16,6 @@ function SignUpForm() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -59,11 +58,8 @@ function SignUpForm() {
     const newErrors = validateForm();
     
     if (Object.keys(newErrors).length === 0) {
-      // Form valid - lakukan submit
       console.log('Form berhasil disubmit:', formData);
       alert('Pendaftaran berhasil!\nUsername: ' + formData.username + '\nEmail: ' + formData.email);
-      
-      // Reset form
       setFormData({
         username: '',
         email: '',
