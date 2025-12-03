@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
-import './SignIn.css';
-import SignIn from './SignIn';
-import SignUp from './SignUp';
+import React, { useState } from "react";
+import "./SignIn.css";
+import Home from "./Home";
+import Election from "./Election";
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
 
 function App() {
-  // State untuk menentukan halaman yang aktif (default: 'signin')
-  const [currentPage, setCurrentPage] = useState('signin');
+  // State untuk menentukan halaman yang aktif (default: 'home')
+  const [currentPage, setCurrentPage] = useState("home");
 
   return (
     <div>
-      {/* Jika state 'signin', tampilkan komponen SignIn */}
-      {currentPage === 'signin' && (
-        <SignIn onSwitchToSignUp={() => setCurrentPage('signup')} />
-      )}
+      {/* Halaman Home */}
+      {currentPage === "home" && <Home onNavigate={setCurrentPage} />}
 
-      {/* Jika state 'signup', tampilkan komponen SignUp */}
-      {currentPage === 'signup' && (
-        <SignUp onSwitchToSignIn={() => setCurrentPage('signin')} />
-      )}
+      {/* Halaman Election */}
+      {currentPage === "election" && <Election onNavigate={setCurrentPage} />}
+
+      {/* Halaman Sign In */}
+      {currentPage === "signin" && <SignIn onSwitchToSignUp={() => setCurrentPage("signup")} onBack={() => setCurrentPage("home")} />}
+
+      {/* Halaman Sign Up */}
+      {currentPage === "signup" && <SignUp onSwitchToSignIn={() => setCurrentPage("signin")} onBack={() => setCurrentPage("home")} />}
     </div>
   );
 }

@@ -1,47 +1,48 @@
-import React, { useState } from 'react';
-import { Check, X } from 'lucide-react';
-import './SignIn.css';
+// SignUp.js - Simpan di folder src/components/SignUp.js
+import React, { useState } from "react";
+import { Check, X, ArrowLeft } from "lucide-react";
+import "./SignIn.css";
 
-function SignUp({ onSwitchToSignIn }) {
+function SignUp({ onSwitchToSignIn, onBack }) {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    rePassword: ''
+    username: "",
+    email: "",
+    password: "",
+    rePassword: "",
   });
 
   const [errors, setErrors] = useState({});
-  const [showPopup, setShowPopup] = useState(false); 
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.username.trim()) newErrors.username = 'Username wajib diisi';
+    if (!formData.username.trim()) newErrors.username = "Username wajib diisi";
     if (!formData.email.trim()) {
-      newErrors.email = 'Email wajib diisi';
+      newErrors.email = "Email wajib diisi";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Format email tidak valid';
+      newErrors.email = "Format email tidak valid";
     }
     if (!formData.password) {
-      newErrors.password = 'Password wajib diisi';
+      newErrors.password = "Password wajib diisi";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password minimal 6 karakter';
+      newErrors.password = "Password minimal 6 karakter";
     }
     if (!formData.rePassword) {
-      newErrors.rePassword = 'Konfirmasi password wajib diisi';
+      newErrors.rePassword = "Konfirmasi password wajib diisi";
     } else if (formData.password !== formData.rePassword) {
-      newErrors.rePassword = 'Password tidak cocok';
+      newErrors.rePassword = "Password tidak cocok";
     }
     return newErrors;
   };
@@ -49,11 +50,10 @@ function SignUp({ onSwitchToSignIn }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = validateForm();
-    
+
     if (Object.keys(newErrors).length === 0) {
-      
       setShowPopup(true);
-      console.log('Form berhasil disubmit:', formData);
+      console.log("Form berhasil disubmit:", formData);
     } else {
       setErrors(newErrors);
     }
@@ -61,8 +61,7 @@ function SignUp({ onSwitchToSignIn }) {
 
   const closePopup = () => {
     setShowPopup(false);
-    
-    setFormData({ username: '', email: '', password: '', rePassword: '' });
+    setFormData({ username: "", email: "", password: "", rePassword: "" });
   };
 
   return (
@@ -71,59 +70,27 @@ function SignUp({ onSwitchToSignIn }) {
         <h1 className="title">Sign Up</h1>
 
         <form onSubmit={handleSubmit}>
-          
           <div className="input-group">
             <label className="label">Username</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Username"
-              className={`input-field ${errors.username ? 'input-error' : ''}`}
-            />
+            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" className={`input-field ${errors.username ? "input-error" : ""}`} />
             {errors.username && <p className="error-text">{errors.username}</p>}
           </div>
 
-          
           <div className="input-group">
             <label className="label">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="example@gmail.com"
-              className={`input-field ${errors.email ? 'input-error' : ''}`}
-            />
+            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="example@gmail.com" className={`input-field ${errors.email ? "input-error" : ""}`} />
             {errors.email && <p className="error-text">{errors.email}</p>}
           </div>
 
-         
           <div className="input-group">
             <label className="label">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="************"
-              className={`input-field ${errors.password ? 'input-error' : ''}`}
-            />
+            <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="************" className={`input-field ${errors.password ? "input-error" : ""}`} />
             {errors.password && <p className="error-text">{errors.password}</p>}
           </div>
 
-          
           <div className="input-group">
             <label className="label">Re-password</label>
-            <input
-              type="password"
-              name="rePassword"
-              value={formData.rePassword}
-              onChange={handleChange}
-              placeholder="************"
-              className={`input-field ${errors.rePassword ? 'input-error' : ''}`}
-            />
+            <input type="password" name="rePassword" value={formData.rePassword} onChange={handleChange} placeholder="************" className={`input-field ${errors.rePassword ? "input-error" : ""}`} />
             {errors.rePassword && <p className="error-text">{errors.rePassword}</p>}
           </div>
 
@@ -131,34 +98,30 @@ function SignUp({ onSwitchToSignIn }) {
             Sign Up
           </button>
         </form>
-        
-        
+
         <p className="footer-text text-center">
-          Already have an account? 
+          Already have an account?
           <span className="link-text" onClick={onSwitchToSignIn}>
             Sign In
           </span>
         </p>
-
       </div>
 
-      
       {showPopup && (
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="close-btn" onClick={closePopup}>
               <X size={24} color="#ef4444" />
             </button>
-            
+
             <div className="success-icon">
               <Check size={40} color="white" strokeWidth={4} />
             </div>
-            
+
             <h2 className="success-title">Sign up berhasil!</h2>
           </div>
         </div>
       )}
-
     </div>
   );
 }

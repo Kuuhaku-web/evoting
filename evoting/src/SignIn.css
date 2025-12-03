@@ -1,8 +1,7 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
-
 
 .container {
   min-height: 100vh;
@@ -12,17 +11,15 @@ body {
   background-color: #fff;
 }
 
-
 .form-card {
   background-color: white;
   padding: 40px;
   border-radius: 8px;
   width: 100%;
-  
-  max-width: 450px; 
+
+  max-width: 450px;
   animation: fadeInCard 0.5s ease-out;
 }
-
 
 .form-card.signin-card {
   max-width: 500px;
@@ -30,16 +27,22 @@ body {
 
 @media (min-width: 600px) {
   .container {
-      background-color: #f9fafb;
+    background-color: #f9fafb;
   }
   .form-card {
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   }
 }
 
 @keyframes fadeInCard {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .title {
@@ -49,7 +52,6 @@ body {
   font-weight: bold;
   color: #000;
 }
-
 
 .input-group {
   margin-bottom: 20px;
@@ -94,9 +96,8 @@ body {
   margin-top: 4px;
 }
 
-
-
-.submit-btn, .signin-btn {
+.submit-btn,
+.signin-btn {
   padding: 12px 32px;
   background-color: #3b49df;
   color: white;
@@ -110,22 +111,19 @@ body {
   display: block;
 }
 
-.submit-btn:hover, .signin-btn:hover {
+.submit-btn:hover,
+.signin-btn:hover {
   background-color: #2f3ab2;
 }
-
 
 .submit-btn-full {
   width: 100%;
 }
 
-
 .signin-btn {
   width: auto;
   min-width: 120px;
 }
-
-
 
 .footer-text {
   font-size: 15px;
@@ -133,14 +131,13 @@ body {
   margin-top: 30px;
 }
 
-
 .text-left {
   text-align: left;
 }
 
 .text-center {
   text-align: center;
-  margin-top: 20px; 
+  margin-top: 20px;
 }
 
 .link-text {
@@ -155,7 +152,6 @@ body {
 .link-text:hover {
   text-decoration: underline;
 }
-
 
 .modal-overlay {
   position: fixed;
@@ -179,8 +175,8 @@ body {
   position: relative;
   width: 90%;
   max-width: 350px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .close-btn {
@@ -210,5 +206,21 @@ body {
   color: #333;
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes popUp { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes popUp {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
