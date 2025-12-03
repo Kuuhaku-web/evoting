@@ -27,7 +27,7 @@ function Home({ onNavigate }) {
             </a>
             
             {/* ITEM BARU: Profile Icon */}
-            <button className="profile-btn" onClick={() => console.log("Profile clicked")}>
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
                 <UserCircle size={32} color="#1f2937" />
             </button>
 
