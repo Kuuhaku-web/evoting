@@ -1,5 +1,5 @@
-// Election.js - Simpan di folder src/components/Election.js
 import React from "react";
+import { UserCircle } from "lucide-react";
 import "./Election.css";
 
 function Election({ onNavigate }) {
@@ -48,7 +48,7 @@ function Election({ onNavigate }) {
 
   return (
     <div className="election-container">
-      {/* Navigation - Same as Home */}
+      {/* Navigation - With Profile Icon & Login Button */}
       <nav className="navbar">
         <div className="nav-content">
           <div className="nav-brand">
@@ -62,12 +62,19 @@ function Election({ onNavigate }) {
             <a href="#elections" className="nav-link active">
               Elections
             </a>
-            <a href="#results" className="nav-link">
+            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
               Results
             </a>
             <a href="#help" className="nav-link">
               Help/FAQ
             </a>
+            
+            {/* ITEM BARU: Profile Icon */}
+            <button className="profile-btn" onClick={() => console.log("Profile Clicked")}>
+                <UserCircle size={32} color="#1f2937" />
+            </button>
+
+            {/* Tombol Login/Register */}
             <button className="login-btn" onClick={() => onNavigate("signup")}>
               Login / Register
             </button>
@@ -86,7 +93,12 @@ function Election({ onNavigate }) {
           {ukmList.map((ukm) => (
             <div key={ukm.id} className="ukm-card">
               <div className="ukm-image-wrapper">
-                <img src={ukm.image} alt={ukm.name} className="ukm-image" />
+                <img 
+                  src={ukm.image} 
+                  alt={ukm.name} 
+                  className="ukm-image" 
+                  onError={(e) => {e.target.src = 'https://via.placeholder.com/300?text=' + ukm.name}}
+                />
               </div>
               <div className="ukm-info">
                 <h3 className="ukm-name">{ukm.name}</h3>
@@ -97,7 +109,7 @@ function Election({ onNavigate }) {
         </div>
       </div>
 
-      {/* Footer - Same as Home */}
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
           <p className="footer-text">© 2024 E-Voting System. All Rights Reserved.</p>

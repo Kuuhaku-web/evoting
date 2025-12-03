@@ -1,4 +1,4 @@
-/* Home.css - Simpan di folder src/components/Home.css */
+/* Home.css */
 
 * {
   margin: 0;
@@ -21,16 +21,10 @@
   z-index: 100;
 }
 
-.brand-logo {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-}
-
 .nav-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0.2rem 0.5rem;
+  padding: 0.5rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,8 +36,10 @@
   gap: 0.5rem;
 }
 
-.brand-icon {
-  color: #2563eb;
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .brand-text {
@@ -55,7 +51,7 @@
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem; /* Jarak antar item navbar */
 }
 
 .nav-link {
@@ -63,12 +59,32 @@
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
+  cursor: pointer;
 }
 
 .nav-link:hover {
   color: #2563eb;
 }
 
+/* Tombol Profile */
+.profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  margin-right: 0.5rem; /* Jarak ke tombol Login */
+}
+
+.profile-btn:hover {
+  background-color: #f3f4f6;
+}
+
+/* Tombol Login/Register (Style asli) */
 .login-btn {
   background: #2563eb;
   color: white;
