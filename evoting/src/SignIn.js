@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import './SignIn.css'; 
 
-function SignIn({ onSwitchToSignUp }) {
+// --- PERBAIKAN 1: Tambahkan onNavigate di sini ---
+function SignIn({ onSwitchToSignUp, onNavigate }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -18,17 +19,17 @@ function SignIn({ onSwitchToSignUp }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Login Data:', formData);
-   
+    
+    // --- SEKARANG INI SUDAH BISA JALAN ---
+    onNavigate("home"); 
   };
 
   return (
     <div className="container">
-     
       <div className="form-card signin-card">
         <h1 className="title">Sign In</h1>
 
         <form onSubmit={handleSubmit}>
-         
           <div className="input-group">
             <label className="label">Email</label>
             <input
@@ -41,7 +42,6 @@ function SignIn({ onSwitchToSignUp }) {
               required
             />
           </div>
-
           
           <div className="input-group">
             <label className="label">Password</label>
@@ -55,17 +55,12 @@ function SignIn({ onSwitchToSignUp }) {
               required
             />
           </div>
-
           
-          <button 
-            type="submit" 
-            className="signin-btn"
-          >
+          <button type="submit" className="signin-btn">
             Sign In
           </button>
         </form>
 
-        
         <div className="footer-text text-left">
           Dont have an account? 
           <span className="link-text" onClick={onSwitchToSignUp}>

@@ -8,14 +8,14 @@ function Profile({ onNavigate }) {
     name: "Pragos",
     nim: "2702278892",
     major: "Computer Science",
-    email: "Pragos.binusian@binus.ac.id",
+    email: "Pragos@binus.ac.id",
     campus: "Kemanggisan",
     joinDate: "Sept 2021"
   };
 
   const votingHistory = [
     { id: 1, event: "Pemilihan Ketua HIMTI 2024", choice: "Calon 02 - Budi Santoso", date: "12 Oct 2023", status: "Selesai" },
-    { id: 2, event: "Pemilihan Ketua UKM Gaming", choice: "Calon 01 - Siti Aminah", date: "15 Nov 2023", status: "Selesai" }
+    { id: 2, event: "Pemilihan Ketua UKM Gaming", choice: "Calon 01 - Siti Herbert", date: "15 Nov 2023", status: "Selesai" }
   ];
 
   return (

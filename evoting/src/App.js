@@ -4,7 +4,7 @@ import Home from "./Home";
 import Election from "./Election";
 import Result from "./Result";
 import Help from "./Help";
-import Profile from "./Profile"; // <--- 1. IMPORT PROFILE
+import Profile from "./Profile"; 
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
@@ -37,7 +37,6 @@ function App() {
 
       {currentPage === "help" && <Help onNavigate={setCurrentPage} />}
       
-      {/* --- 2. TAMBAHKAN NAVIGASI KE PROFILE --- */}
       {currentPage === "profile" && <Profile onNavigate={setCurrentPage} />}
 
       {currentPage === "signin" && (
@@ -49,7 +48,13 @@ function App() {
           onBack={() => {
             setCurrentPage("home");
             window.location.hash = "";
-          }} 
+          }}
+          // --- PERBAIKAN 2: TAMBAHKAN BARIS INI ---
+          onNavigate={(page) => {
+            setCurrentPage(page);
+            // Opsional: Reset URL hash saat kembali ke home
+            if (page === "home") window.location.hash = "";
+          }}
         />
       )}
 
