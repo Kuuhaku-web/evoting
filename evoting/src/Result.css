@@ -1,0 +1,250 @@
+/* Result.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.result-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  color: #1f2937;
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar (Sama dengan Home) */
+.navbar {
+  background: white;
+  padding: 0.5rem 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.brand-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Gap disesuaikan */
+}
+
+.nav-link {
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #2563eb;
+}
+
+/* Tombol Profile */
+.profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  margin-right: 0.5rem;
+}
+
+.profile-btn:hover {
+  background-color: #f3f4f6;
+}
+
+/* Tombol Login/Register */
+.login-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Result Content */
+.result-content {
+  flex: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  width: 100%;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 2.5rem;
+}
+
+.header-icon {
+  color: #3b82f6;
+}
+
+.result-title {
+  font-size: 2rem;
+  font-weight: 400;
+  color: #000;
+}
+
+/* Total Votes Box */
+.total-votes-box {
+  background-color: #e5e7eb;
+  border-radius: 12px;
+  padding: 3rem 0;
+  text-align: center;
+  margin-bottom: 3rem;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.total-number {
+  font-size: 3.5rem;
+  font-weight: 500;
+  color: #4f46e5;
+}
+
+/* Candidates List */
+.candidates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.candidate-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.candidate-name {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 0.25rem;
+}
+
+.candidate-role {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.vote-stats {
+  text-align: right;
+}
+
+.vote-count {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #3b82f6;
+}
+
+.vote-percentage {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Progress Bar */
+.progress-track {
+  width: 100%;
+  height: 14px;
+  background-color: #f3f4f6;
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 1s ease-out;
+}
+
+/* Footer */
+.footer {
+  padding: 2rem;
+  text-align: center;
+  background: #111827;
+}
+
+.footer-text {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .nav-links {
+    gap: 1rem;
+  }
+  
+  .total-number {
+    font-size: 2.5rem;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .vote-stats {
+    text-align: left;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

@@ -1,5 +1,5 @@
 import React from "react";
-import { Vote, Users, CheckSquare, Smartphone, Shield, TrendingUp } from "lucide-react";
+import { Vote, Users, CheckSquare, Smartphone, Shield, TrendingUp, UserCircle } from "lucide-react";
 import "./Home.css";
 
 function Home({ onNavigate }) {
@@ -12,18 +12,26 @@ function Home({ onNavigate }) {
             <span className="brand-text">E-Voting</span>
           </div>
           <div className="nav-links">
-            <a href="#home" className="nav-link">
+            <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>
               Home
             </a>
             <a href="#elections" className="nav-link" onClick={() => onNavigate("election")}>
               Elections
             </a>
-            <a href="#results" className="nav-link">
+            {/* Navigasi ke Result */}
+            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
               Results
             </a>
             <a href="#help" className="nav-link">
               Help/FAQ
             </a>
+            
+            {/* ITEM BARU: Profile Icon */}
+            <button className="profile-btn" onClick={() => console.log("Profile clicked")}>
+                <UserCircle size={32} color="#1f2937" />
+            </button>
+
+            {/* Tombol Login/Register (Seperti Gambar Pertama) */}
             <button className="login-btn" onClick={() => onNavigate("signup")}>
               Login / Register
             </button>
@@ -47,7 +55,7 @@ function Home({ onNavigate }) {
               Welcome to the official E-Voting platform for student activity units. Participate in your UKM's governance with a secure, transparent, and easy-to-use system. Make your voice heard, help build a better community, and lead the
               change you want to see.
             </p>
-            <button className="cta-btn">View Elections</button>
+            <button className="cta-btn" onClick={() => onNavigate("election")}>View Elections</button>
           </div>
         </div>
       </section>
