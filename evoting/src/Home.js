@@ -5,6 +5,7 @@ import "./Home.css";
 function Home({ onNavigate }) {
   return (
     <div className="home-container">
+      {/* --- NAVBAR --- */}
       <nav className="navbar">
         <div className="nav-content">
           <div className="nav-brand">
@@ -15,23 +16,22 @@ function Home({ onNavigate }) {
             <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>
               Home
             </a>
-            <a href="#elections" className="nav-link" onClick={() => onNavigate("election")}>
+            <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>
               Elections
             </a>
-            {/* Navigasi ke Result */}
             <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
               Results
             </a>
-            <a href="#help" className="nav-link">
+            <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>
               Help/FAQ
             </a>
             
-            {/* ITEM BARU: Profile Icon */}
-            <button className="profile-btn" onClick={() => console.log("Profile clicked")}>
+            {/* Profile Icon */}
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
                 <UserCircle size={32} color="#1f2937" />
             </button>
 
-            {/* Tombol Login/Register (Seperti Gambar Pertama) */}
+            {/* Tombol Login/Register */}
             <button className="login-btn" onClick={() => onNavigate("signup")}>
               Login / Register
             </button>
@@ -39,6 +39,7 @@ function Home({ onNavigate }) {
         </div>
       </nav>
 
+      {/* --- HERO SECTION --- */}
       <section className="hero-section">
         <div className="hero-content">
           <div className="hero-illustration">
@@ -60,24 +61,31 @@ function Home({ onNavigate }) {
         </div>
       </section>
 
+      {/* --- HOW IT WORKS (UPDATED) --- */}
       <section className="how-it-works">
         <h2 className="section-title">How It Works</h2>
         <p className="section-subtitle">Casting your vote is a simple and secure process. Follow these three easy steps to participate in the elections.</p>
         <div className="steps-grid">
-          <div className="step-card">
+          
+          {/* STEP 1: Register & Verify (Klik -> Signup) */}
+          <div className="step-card" onClick={() => onNavigate("signup")}>
             <div className="step-icon">
               <Users size={32} />
             </div>
             <h3 className="step-title">1. Register & Verify</h3>
             <p className="step-description">Quickly sign up using your student credentials and verify your identity to get started.</p>
           </div>
-          <div className="step-card">
+
+          {/* STEP 2: Browse Candidates (Klik -> Election) */}
+          <div className="step-card" onClick={() => onNavigate("election")}>
             <div className="step-icon">
               <Vote size={32} />
             </div>
             <h3 className="step-title">2. Browse Candidates</h3>
             <p className="step-description">Learn about the candidates and their platforms to make an informed decision.</p>
           </div>
+
+          {/* STEP 3: Cast Your Vote */}
           <div className="step-card">
             <div className="step-icon">
               <CheckSquare size={32} />
@@ -85,9 +93,11 @@ function Home({ onNavigate }) {
             <h3 className="step-title">3. Cast Your Vote</h3>
             <p className="step-description">Submit your vote securely and confidentially from anywhere, on any device.</p>
           </div>
+
         </div>
       </section>
 
+      {/* --- UPCOMING ELECTIONS --- */}
       <section className="upcoming-elections">
         <h2 className="section-title">Upcoming Elections</h2>
         <div className="elections-grid">
@@ -118,6 +128,7 @@ function Home({ onNavigate }) {
         </div>
       </section>
 
+      {/* --- WHY MATTERS --- */}
       <section className="why-matters">
         <h2 className="section-title">Why E-Voting Matters</h2>
         <p className="section-subtitle">Our platform is built to make student governance more accessible, secure, and transparent for everyone.</p>
@@ -146,6 +157,7 @@ function Home({ onNavigate }) {
         </div>
       </section>
 
+      {/* --- CTA SECTION --- */}
       <section className="cta-section">
         <div className="cta-content">
           <h2 className="cta-title">Ready to make a difference?</h2>
@@ -156,6 +168,7 @@ function Home({ onNavigate }) {
         </div>
       </section>
 
+      {/* --- FOOTER --- */}
       <footer className="footer">
         <div className="footer-content">
           <p className="footer-text">© 2024 E-Voting System. All Rights Reserved.</p>

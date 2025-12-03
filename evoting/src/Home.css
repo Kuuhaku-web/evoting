@@ -51,7 +51,7 @@
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.5rem; /* Jarak antar item navbar */
+  gap: 1.5rem;
 }
 
 .nav-link {
@@ -77,14 +77,14 @@
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s;
-  margin-right: 0.5rem; /* Jarak ke tombol Login */
+  margin-right: 0.5rem;
 }
 
 .profile-btn:hover {
   background-color: #f3f4f6;
 }
 
-/* Tombol Login/Register (Style asli) */
+/* Tombol Login/Register */
 .login-btn {
   background: #2563eb;
   color: white;
@@ -233,11 +233,19 @@
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   transition: transform 0.3s, box-shadow 0.3s;
+  
+  /* --- UPDATE: Agar kursor berubah jadi tangan --- */
+  cursor: pointer;
 }
 
 .step-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Efek klik */
+.step-card:active {
+  transform: scale(0.98);
 }
 
 .step-icon {

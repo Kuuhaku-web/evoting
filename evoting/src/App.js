@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-// Hapus import global CSS karena setiap komponen sudah import CSS-nya sendiri
+import React, { useState, useEffect } from "react";
+// Import semua komponen halaman
 import Home from "./Home";
 import Election from "./Election";
-import Result from "./Result"; // Import file Result.js (tanpa 's')
+import Result from "./Result";
+import Help from "./Help";
+import Profile from "./Profile"; 
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import UkmDetail from "./UkmDetail";
 
 function App() {
-  // State untuk menentukan halaman yang aktif (default: 'home')
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedUkm, setSelectedUkm] = useState("");
 
@@ -19,9 +20,24 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash) {
+        setCurrentPage(hash);
+      } else {
+        setCurrentPage("home");
+      }
+    };
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
+
   return (
     <div>
-      {/* Halaman Home */}
       {currentPage === "home" && <Home onNavigate={setCurrentPage} />}
 
       {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} />}
@@ -29,14 +45,43 @@ function App() {
       {/* Halaman Election */}
       {currentPage === "election" && <Election onNavigate={setCurrentPage} />}
 
-      {/* Halaman Result (sebelumnya Results) */}
       {currentPage === "result" && <Result onNavigate={setCurrentPage} />}
 
-      {/* Halaman Sign In */}
-      {currentPage === "signin" && <SignIn onSwitchToSignUp={() => setCurrentPage("signup")} onBack={() => setCurrentPage("home")} />}
+      {currentPage === "help" && <Help onNavigate={setCurrentPage} />}
+      
+      {currentPage === "profile" && <Profile onNavigate={setCurrentPage} />}
 
-      {/* Halaman Sign Up */}
-      {currentPage === "signup" && <SignUp onSwitchToSignIn={() => setCurrentPage("signin")} onBack={() => setCurrentPage("home")} />}
+      {currentPage === "signin" && (
+        <SignIn 
+          onSwitchToSignUp={() => {
+            setCurrentPage("signup");
+            window.location.hash = "signup";
+          }} 
+          onBack={() => {
+            setCurrentPage("home");
+            window.location.hash = "";
+          }}
+          // --- PERBAIKAN 2: TAMBAHKAN BARIS INI ---
+          onNavigate={(page) => {
+            setCurrentPage(page);
+            // Opsional: Reset URL hash saat kembali ke home
+            if (page === "home") window.location.hash = "";
+          }}
+        />
+      )}
+
+      {currentPage === "signup" && (
+        <SignUp 
+          onSwitchToSignIn={() => {
+            setCurrentPage("signin");
+            window.location.hash = "signin";
+          }} 
+          onBack={() => {
+            setCurrentPage("home");
+            window.location.hash = "";
+          }} 
+        />
+      )}
     </div>
   );
 }
