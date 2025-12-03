@@ -1,0 +1,221 @@
+/* VoteConfirmation.css - Simpan di folder src/components/VoteConfirmation.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.confirmation-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.confirmation-card {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Icon */
+.confirmation-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+}
+
+/* Title & Subtitle */
+.confirmation-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.confirmation-subtitle {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* Candidate Box */
+.candidate-box {
+  background: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.candidate-box-info {
+  flex: 1;
+}
+
+.candidate-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.candidate-box-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.candidate-box-position {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.candidate-box-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-left: 1.5rem;
+}
+
+.candidate-box-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Transaction Details */
+.transaction-details {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+}
+
+.detail-row:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.detail-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.detail-value.status {
+  color: #f59e0b;
+}
+
+/* Warning Box */
+.warning-box {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #92400e;
+  margin-bottom: 2rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.btn-change,
+.btn-submit {
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-change {
+  background: #9ca3af;
+  color: white;
+}
+
+.btn-change:hover {
+  background: #6b7280;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(156, 163, 175, 0.4);
+}
+
+.btn-submit {
+  background: #6366f1;
+  color: white;
+}
+
+.btn-submit:hover {
+  background: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .confirmation-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .confirmation-title {
+    font-size: 1.5rem;
+  }
+
+  .candidate-box {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .candidate-box-photo {
+    margin-left: 0;
+    margin-top: 1rem;
+    width: 100px;
+    height: 100px;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: center;
+  }
+}

@@ -1,11 +1,9 @@
 // UkmDetail.js - Simpan di folder src/components/UkmDetail.js
-import React, { useState } from "react";
+import React from "react";
 import { UserCircle, ArrowLeft } from "lucide-react";
 import "./UkmDetail.css";
 
 function UkmDetail({ onNavigate, ukmName }) {
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-
   // Data kandidat (bisa disesuaikan per UKM)
   const candidates = [
     {
@@ -31,10 +29,14 @@ function UkmDetail({ onNavigate, ukmName }) {
     },
   ];
 
-  const handleVote = (candidateId) => {
-    setSelectedCandidate(candidateId);
-    // Implement voting logic here
-    console.log(`Voted for candidate ${candidateId} in ${ukmName}`);
+  const handleVote = (candidate) => {
+    // Navigate to confirmation page with candidate data
+    onNavigate("voteconfirmation", ukmName, {
+      name: candidate.name,
+      position: candidate.position,
+      photo: candidate.photo,
+      ukmName: ukmName,
+    });
   };
 
   return (
@@ -50,16 +52,16 @@ function UkmDetail({ onNavigate, ukmName }) {
             <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>
               Home
             </a>
-            <a href="#elections" className="nav-link" onClick={() => onNavigate("election")}>
+            <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>
               Elections
             </a>
-            <a href="#results" className="nav-link">
+            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
               Results
             </a>
-            <a href="#help" className="nav-link">
+            <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>
               Help/FAQ
             </a>
-            <button className="profile-btn">
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
               <UserCircle size={32} color="#1f2937" />
             </button>
             <button className="login-btn" onClick={() => onNavigate("signup")}>
@@ -95,8 +97,8 @@ function UkmDetail({ onNavigate, ukmName }) {
                   {candidate.name} | {candidate.position}
                 </h3>
                 <p className="candidate-description">{candidate.description}</p>
-                <button className={`vote-button ${selectedCandidate === candidate.id ? "voted" : ""}`} onClick={() => handleVote(candidate.id)}>
-                  {selectedCandidate === candidate.id ? "Sudah Dipilih" : "Vote"}
+                <button className="vote-button" onClick={() => handleVote(candidate)}>
+                  Vote
                 </button>
               </div>
             </div>

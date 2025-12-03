@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { UserCircle } from "lucide-react";
 import "./Election.css";
 
-function Election({ onNavigate }) {
+function Election({ onNavigate, showSuccessPopup = false, onPopupClose }) {
+  const [showPopup, setShowPopup] = useState(false);
+
+
+  // Show popup when redirected from vote confirmation
+  useEffect(() => {
+    if (showSuccessPopup) {
+      setShowPopup(true);
+
+      setTimeout(() => {
+        if (onPopupClose) {
+          onPopupClose();
+        }
+      }, 0);
+    }
+  }, [showSuccessPopup, onPopupClose]);
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
   const ukmList = [
     {
       id: 1,
@@ -48,6 +68,15 @@ function Election({ onNavigate }) {
 
   return (
     <div className="election-container">
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-card success">
+            <h2>🎉 Suara Berhasil Terkirim!</h2>
+            <p>Terima kasih telah berpartisipasi dalam pemilihan. Suara Anda telah dicatat.</p>
+            <button onClick={closePopup}>Lanjutkan</button>
+          </div>
+        </div>
+      )}
       {/* Navigation - With Profile Icon & Login Button */}
       <nav className="navbar">
         <div className="nav-content">
@@ -59,7 +88,7 @@ function Election({ onNavigate }) {
             <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>
               Home
             </a>
-            <a href="#elections" className="nav-link active">
+            <a href="#election" className="nav-link active" onClick={() => onNavigate("election")}>
               Elections
             </a>
             <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
@@ -70,7 +99,7 @@ function Election({ onNavigate }) {
             </a>
 
             {/* ITEM BARU: Profile Icon */}
-            <button className="profile-btn" onClick={() => console.log("Profile Clicked")}>
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
               <UserCircle size={32} color="#1f2937" />
             </button>
 

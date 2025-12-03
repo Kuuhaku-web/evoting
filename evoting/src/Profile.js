@@ -10,12 +10,12 @@ function Profile({ onNavigate }) {
     major: "Computer Science",
     email: "Pragos@binus.ac.id",
     campus: "Kemanggisan",
-    joinDate: "Sept 2021"
+    joinDate: "Sept 2021",
   };
 
   const votingHistory = [
     { id: 1, event: "Pemilihan Ketua HIMTI 2024", choice: "Calon 02 - Budi Santoso", date: "12 Oct 2023", status: "Selesai" },
-    { id: 2, event: "Pemilihan Ketua UKM Gaming", choice: "Calon 01 - Siti Herbert", date: "15 Nov 2023", status: "Selesai" }
+    { id: 2, event: "Pemilihan Ketua UKM Gaming", choice: "Calon 01 - Siti Herbert", date: "15 Nov 2023", status: "Selesai" },
   ];
 
   return (
@@ -28,24 +28,33 @@ function Profile({ onNavigate }) {
             <span className="brand-text">E-Voting</span>
           </div>
           <div className="nav-links">
-            <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>Home</a>
-            <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>Elections</a>
-            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>Results</a>
-            <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>Help/FAQ</a>
-            
+            <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>
+              Home
+            </a>
+            <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>
+              Elections
+            </a>
+            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
+              Results
+            </a>
+            <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>
+              Help/FAQ
+            </a>
+
             {/* Tombol Profile Aktif */}
             <button className="profile-btn active" onClick={() => onNavigate("profile")}>
-                <User size={24} color="#2563eb" />
+              <User size={24} color="#2563eb" />
             </button>
-            
-            <button className="login-btn" onClick={() => onNavigate("signin")}>Logout</button>
+
+            <button className="login-btn" onClick={() => onNavigate("signin")}>
+              Logout
+            </button>
           </div>
         </div>
       </nav>
 
       {/* --- KONTEN PROFILE --- */}
       <div className="profile-container">
-        
         {/* Kartu Identitas Utama */}
         <div className="profile-header-card">
           <div className="profile-avatar-section">
@@ -56,7 +65,7 @@ function Profile({ onNavigate }) {
             <p className="profile-nim">{userData.nim}</p>
             <span className="profile-badge">Active Student</span>
           </div>
-          
+
           <div className="profile-details-grid">
             <div className="detail-item">
               <Mail size={18} className="detail-icon" />
@@ -97,7 +106,9 @@ function Profile({ onNavigate }) {
               <div key={item.id} className="history-card">
                 <div className="history-info">
                   <h4>{item.event}</h4>
-                  <p>Pilihan: <strong>{item.choice}</strong></p>
+                  <p>
+                    Pilihan: <strong>{item.choice}</strong>
+                  </p>
                 </div>
                 <div className="history-meta">
                   <span className="date">{item.date}</span>
@@ -107,7 +118,6 @@ function Profile({ onNavigate }) {
             ))}
           </div>
         </div>
-
       </div>
     </div>
   );
