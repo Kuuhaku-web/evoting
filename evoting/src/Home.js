@@ -15,7 +15,7 @@ function Home({ onNavigate }) {
             <a href="#home" className="nav-link">
               Home
             </a>
-            <a href="#elections" className="nav-link">
+            <a href="#elections" className="nav-link" onClick={() => onNavigate("election")}>
               Elections
             </a>
             <a href="#results" className="nav-link">

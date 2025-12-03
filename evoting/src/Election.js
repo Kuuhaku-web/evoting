@@ -6,43 +6,43 @@ function Election({ onNavigate }) {
   const ukmList = [
     {
       id: 1,
-      name: "Ukm A",
-      image: "https://images.unsplash.com/photo-1562774053-701939374585?w=400&h=300&fit=crop",
+      name: "Badminton",
+      image: "./img/badminton.png",
     },
     {
       id: 2,
-      name: "Ukm B",
-      image: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400&h=300&fit=crop",
+      name: "Basketball",
+      image: "./img/basket.png",
     },
     {
       id: 3,
-      name: "Ukm C",
-      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&h=300&fit=crop",
+      name: "Binusian Gaming",
+      image: "./img/gaming.png",
     },
     {
       id: 4,
-      name: "Ukm D",
-      image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=300&fit=crop",
+      name: "Sepakbola",
+      image: "./img/sepakbola.png",
     },
     {
       id: 5,
-      name: "Ukm E",
-      image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=300&fit=crop",
+      name: "Musik",
+      image: "./img/musik.png",
     },
     {
       id: 6,
-      name: "Ukm F",
-      image: "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=400&h=300&fit=crop",
+      name: "B-Preneur",
+      image: "./img/bpreneur.png",
     },
     {
       id: 7,
-      name: "Ukm G",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=300&fit=crop",
+      name: "KMBD",
+      image: "./img/kmbd.jpg",
     },
     {
       id: 8,
-      name: "Ukm H",
-      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=300&fit=crop",
+      name: "Wushu",
+      image: "./img/wushu.jpg",
     },
   ];
 
