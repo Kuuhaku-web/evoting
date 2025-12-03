@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "ethers": "^6.15.0",
-    "lucide-react": "^0.555.0",
-    "react-router-dom": "^7.9.6"
-  }
-}
