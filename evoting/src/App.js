@@ -5,15 +5,26 @@ import Election from "./Election";
 import Result from "./Result"; // Import file Result.js (tanpa 's')
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
+import UkmDetail from "./UkmDetail";
 
 function App() {
   // State untuk menentukan halaman yang aktif (default: 'home')
   const [currentPage, setCurrentPage] = useState("home");
+  const [selectedUkm, setSelectedUkm] = useState("");
+
+  const handleNavigate = (page, ukmName = "") => {
+    setCurrentPage(page);
+    if (ukmName) {
+      setSelectedUkm(ukmName);
+    }
+  };
 
   return (
     <div>
       {/* Halaman Home */}
       {currentPage === "home" && <Home onNavigate={setCurrentPage} />}
+
+      {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} />}
 
       {/* Halaman Election */}
       {currentPage === "election" && <Election onNavigate={setCurrentPage} />}

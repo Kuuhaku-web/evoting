@@ -68,10 +68,10 @@ function Election({ onNavigate }) {
             <a href="#help" className="nav-link">
               Help/FAQ
             </a>
-            
+
             {/* ITEM BARU: Profile Icon */}
             <button className="profile-btn" onClick={() => console.log("Profile Clicked")}>
-                <UserCircle size={32} color="#1f2937" />
+              <UserCircle size={32} color="#1f2937" />
             </button>
 
             {/* Tombol Login/Register */}
@@ -93,16 +93,20 @@ function Election({ onNavigate }) {
           {ukmList.map((ukm) => (
             <div key={ukm.id} className="ukm-card">
               <div className="ukm-image-wrapper">
-                <img 
-                  src={ukm.image} 
-                  alt={ukm.name} 
-                  className="ukm-image" 
-                  onError={(e) => {e.target.src = 'https://via.placeholder.com/300?text=' + ukm.name}}
+                <img
+                  src={ukm.image}
+                  alt={ukm.name}
+                  className="ukm-image"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/300?text=" + ukm.name;
+                  }}
                 />
               </div>
               <div className="ukm-info">
                 <h3 className="ukm-name">{ukm.name}</h3>
-                <button className="vote-btn">Pilih Sekarang</button>
+                <button className="vote-btn" onClick={() => onNavigate("ukmdetail", ukm.name)}>
+                  Pilih Sekarang
+                </button>
               </div>
             </div>
           ))}
