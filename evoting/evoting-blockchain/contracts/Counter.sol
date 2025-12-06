@@ -66,7 +66,7 @@ contract BinusUKMVoting {
         _;
     }
     
-    modifier isRegisteredVoter() {
+    modifier onlyRegisteredVoter() {
         require(registeredVoters[msg.sender], "You are not a registered voter");
         _;
     }
@@ -198,7 +198,7 @@ contract BinusUKMVoting {
     function vote(uint256 _categoryId, uint256 _candidateId) 
         external 
         votingIsActive 
-        isRegisteredVoter 
+        onlyRegisteredVoter 
     {
         require(_categoryId > 0 && _categoryId <= categoryCount, "Invalid category");
         require(categories[_categoryId].isActive, "Category is not active");
