@@ -75,7 +75,8 @@ function Home({ onNavigate, user, onAuth }) {
                 <button className="login-btn" onClick={handleLogout} style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem'
+                  gap: '0.5rem',
+                  backgroundColor: '#ef4444'
                 }}>
                   <LogOut size={18} />
                   Logout

@@ -117,16 +117,18 @@ function App() {
           onNavigate={handleNavigate}
           showSuccessPopup={showSuccessPopup}
           onPopupClose={handleResetPopup}
+          user={user}
+          onAuth={handleSetUser}
         />
       )}
 
       {/* JIKA currentPage = "results", TAMPILKAN ResultsReal */}
       {/* Kalau isi file resultsReal.js sudah diganti (poin 1), tampilannya pasti beda sama Election */}
-      {currentPage === "results" && <ResultsReal onNavigate={handleNavigate} />}
+      {currentPage === "results" && <ResultsReal onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
 
-      {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} />}
-      {currentPage === "result" && <Result onNavigate={handleNavigate} />} 
-      {currentPage === "help" && <Help onNavigate={handleNavigate} />}
+      {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} user={user} onAuth={handleSetUser} />}
+      {currentPage === "result" && <Result onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />} 
+      {currentPage === "help" && <Help onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
       {currentPage === "profile" && <Profile onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
       {currentPage === "voteconfirmation" && candidateData && (
         <VoteConfirmation onNavigate={handleNavigate} candidateData={candidateData} />

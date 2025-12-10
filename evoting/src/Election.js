@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { UserCircle } from "lucide-react";
+import { UserCircle, LogOut } from "lucide-react";
 import "./Election.css";
 
-function Election({ onNavigate, showSuccessPopup = false, onPopupClose }) {
+function Election({ onNavigate, showSuccessPopup = false, onPopupClose, user, onAuth }) {
   const [showPopup, setShowPopup] = useState(false);
+  const [currentUser, setCurrentUser] = useState(user);
+
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+    if (onAuth) onAuth(null);
+    onNavigate('home');
+    window.location.hash = '';
+  };
 
 
   // Show popup when redirected from vote confirmation
@@ -103,10 +117,31 @@ function Election({ onNavigate, showSuccessPopup = false, onPopupClose }) {
               <UserCircle size={32} color="#1f2937" />
             </button>
 
-            {/* Tombol Login/Register */}
-            <button className="login-btn" onClick={() => onNavigate("signup")}>
-              Login / Register
-            </button>
+            {/* Tombol Login/Register atau Username */}
+            {currentUser ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span className="username" style={{
+                  color: '#4b5563',
+                  fontWeight: '600',
+                  fontSize: '0.95rem'
+                }}>
+                  {currentUser.username}
+                </span>
+                <button className="login-btn" onClick={handleLogout} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#ef4444'
+                }}>
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button className="login-btn" onClick={() => onNavigate("signup")}>
+                Login / Register
+              </button>
+            )}
           </div>
         </div>
       </nav>

@@ -1,8 +1,22 @@
-import React from "react";
-import { TrendingUp, UserCircle } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { TrendingUp, UserCircle, LogOut } from "lucide-react";
 import "./Result.css";
 
-function Result({ onNavigate }) {
+function Result({ onNavigate, user, onAuth }) {
+  const [currentUser, setCurrentUser] = useState(user);
+
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+    if (onAuth) onAuth(null);
+    onNavigate('home');
+    window.location.hash = '';
+  };
   // Data dummy untuk hasil voting
   const totalVotes = "10,502";
   
@@ -57,14 +71,35 @@ function Result({ onNavigate }) {
             </a>
             
             {/* ITEM BARU: Profile Icon */}
-            <button className="profile-btn" onClick={() => onNavigate("signup")}>
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
               <UserCircle size={32} color="#1f2937" />
             </button>
 
-            {/* Tombol Login/Register (Dikembalikan) */}
-            <button className="login-btn" onClick={() => onNavigate("signup")}>
-              Login / Register
-            </button>
+            {/* Tombol Login/Register atau Username */}
+            {currentUser ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span className="username" style={{
+                  color: '#4b5563',
+                  fontWeight: '600',
+                  fontSize: '0.95rem'
+                }}>
+                  {currentUser.username}
+                </span>
+                <button className="login-btn" onClick={handleLogout} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#ef4444'
+                }}>
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button className="login-btn" onClick={() => onNavigate("signup")}>
+                Login / Register
+              </button>
+            )}
           </div>
         </div>
       </nav>

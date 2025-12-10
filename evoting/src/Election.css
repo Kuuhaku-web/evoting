@@ -118,6 +118,19 @@
   background: #1d4ed8;
 }
 
+/* User Section */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
 /* Election Content */
 .election-content {
   flex: 1;

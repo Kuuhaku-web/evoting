@@ -1,10 +1,23 @@
-import React, { useState } from "react";
-import { UserCircle, HelpCircle, ShieldCheck, Database, Lock, ChevronDown, ChevronUp } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { UserCircle, HelpCircle, ShieldCheck, Database, Lock, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import "./Help.css";
 
-function Help({ onNavigate }) {
-  // State untuk mengontrol accordion FAQ
+function Help({ onNavigate, user, onAuth }) {
   const [openIndex, setOpenIndex] = useState(null);
+  const [currentUser, setCurrentUser] = useState(user);
+
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+    if (onAuth) onAuth(null);
+    onNavigate('home');
+    window.location.hash = '';
+  };
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -57,14 +70,35 @@ function Help({ onNavigate }) {
             </a>
             
             {/* Profile Icon */}
-            <button className="profile-btn" onClick={() => console.log("Profile Clicked")}>
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
               <UserCircle size={32} color="#1f2937" />
             </button>
 
-            {/* Login Button */}
-            <button className="login-btn" onClick={() => onNavigate("signup")}>
-              Login / Register
-            </button>
+            {/* Login Button atau Username */}
+            {currentUser ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span className="username" style={{
+                  color: '#4b5563',
+                  fontWeight: '600',
+                  fontSize: '0.95rem'
+                }}>
+                  {currentUser.username}
+                </span>
+                <button className="login-btn" onClick={handleLogout} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#ef4444'
+                }}>
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button className="login-btn" onClick={() => onNavigate("signup")}>
+                Login / Register
+              </button>
+            )}
           </div>
         </div>
       </nav>
