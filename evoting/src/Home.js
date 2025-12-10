@@ -19,19 +19,21 @@ function Home({ onNavigate }) {
             <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>
               Elections
             </a>
-            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
+            
+            {/* BAGIAN PENTING: Link ke Results */}
+            <a href="#results" className="nav-link" onClick={() => onNavigate("results")}>
               Results
             </a>
+            {/* ------------------------------- */}
+
             <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>
               Help/FAQ
             </a>
             
-            {/* Profile Icon */}
             <button className="profile-btn" onClick={() => onNavigate("profile")}>
                 <UserCircle size={32} color="#1f2937" />
             </button>
 
-            {/* Tombol Login/Register */}
             <button className="login-btn" onClick={() => onNavigate("signup")}>
               Login / Register
             </button>
@@ -43,148 +45,44 @@ function Home({ onNavigate }) {
       <section className="hero-section">
         <div className="hero-content">
           <div className="hero-illustration">
-            <div className="illustration-wrapper">
-              <div className="circle circle-1"></div>
-              <div className="circle circle-2"></div>
-              <div className="circle circle-3"></div>
-              <div className="circle circle-4"></div>
-            </div>
+             {/* Isi ilustrasi biarkan sama */}
+             <div className="illustration-wrapper">
+               <div className="circle circle-1"></div>
+               <div className="circle circle-2"></div>
+               <div className="circle circle-3"></div>
+               <div className="circle circle-4"></div>
+             </div>
           </div>
           <div className="hero-text">
             <h1 className="hero-title">Your Voice, Your Choice, Shape Your UKM's Future.</h1>
             <p className="hero-description">
-              Welcome to the official E-Voting platform for student activity units. Participate in your UKM's governance with a secure, transparent, and easy-to-use system. Make your voice heard, help build a better community, and lead the
-              change you want to see.
+              Welcome to the official E-Voting platform for student activity units.
             </p>
             <button className="cta-btn" onClick={() => onNavigate("election")}>View Elections</button>
           </div>
         </div>
       </section>
 
-      {/* --- HOW IT WORKS (UPDATED) --- */}
+      {/* --- HOW IT WORKS --- */}
       <section className="how-it-works">
         <h2 className="section-title">How It Works</h2>
-        <p className="section-subtitle">Casting your vote is a simple and secure process. Follow these three easy steps to participate in the elections.</p>
         <div className="steps-grid">
-          
-          {/* STEP 1: Register & Verify (Klik -> Signup) */}
           <div className="step-card" onClick={() => onNavigate("signup")}>
-            <div className="step-icon">
-              <Users size={32} />
-            </div>
-            <h3 className="step-title">1. Register & Verify</h3>
-            <p className="step-description">Quickly sign up using your student credentials and verify your identity to get started.</p>
+             <div className="step-icon"><Users size={32} /></div>
+             <h3 className="step-title">1. Register & Verify</h3>
           </div>
-
-          {/* STEP 2: Browse Candidates (Klik -> Election) */}
           <div className="step-card" onClick={() => onNavigate("election")}>
-            <div className="step-icon">
-              <Vote size={32} />
-            </div>
-            <h3 className="step-title">2. Browse Candidates</h3>
-            <p className="step-description">Learn about the candidates and their platforms to make an informed decision.</p>
+             <div className="step-icon"><Vote size={32} /></div>
+             <h3 className="step-title">2. Browse Candidates</h3>
           </div>
-
-          {/* STEP 3: Cast Your Vote */}
           <div className="step-card">
-            <div className="step-icon">
-              <CheckSquare size={32} />
-            </div>
-            <h3 className="step-title">3. Cast Your Vote</h3>
-            <p className="step-description">Submit your vote securely and confidentially from anywhere, on any device.</p>
-          </div>
-
-        </div>
-      </section>
-
-      {/* --- UPCOMING ELECTIONS --- */}
-      <section className="upcoming-elections">
-        <h2 className="section-title">Upcoming Elections</h2>
-        <div className="elections-grid">
-          <div className="election-card">
-            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=250&fit=crop" alt="Photography Club" className="election-image" />
-            <div className="election-info">
-              <h3 className="election-title">Photography Club Election</h3>
-              <p className="election-date">Voting Period: Oct 15 - Oct 18</p>
-              <button className="learn-more-btn">Learn More</button>
-            </div>
-          </div>
-          <div className="election-card">
-            <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=250&fit=crop" alt="Student Debate" className="election-image" />
-            <div className="election-info">
-              <h3 className="election-title">Student Debate Union Presidency</h3>
-              <p className="election-date">Voting Period: Oct 20 - Oct 23</p>
-              <button className="learn-more-btn">Learn More</button>
-            </div>
-          </div>
-          <div className="election-card">
-            <img src="https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400&h=250&fit=crop" alt="Environmental Club" className="election-image" />
-            <div className="election-info">
-              <h3 className="election-title">Environmental Club Leadership</h3>
-              <p className="election-date">Voting Period: Oct 25 - Oct 28</p>
-              <button className="learn-more-btn">Learn More</button>
-            </div>
+             <div className="step-icon"><CheckSquare size={32} /></div>
+             <h3 className="step-title">3. Cast Your Vote</h3>
           </div>
         </div>
       </section>
-
-      {/* --- WHY MATTERS --- */}
-      <section className="why-matters">
-        <h2 className="section-title">Why E-Voting Matters</h2>
-        <p className="section-subtitle">Our platform is built to make student governance more accessible, secure, and transparent for everyone.</p>
-        <div className="features-grid">
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Smartphone size={32} />
-            </div>
-            <h3 className="feature-title">Vote from Anywhere</h3>
-            <p className="feature-description">Cast your ballot conveniently from your laptop, tablet, or smartphone.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Shield size={32} />
-            </div>
-            <h3 className="feature-title">Secure & Anonymous</h3>
-            <p className="feature-description">We use advanced encryption to protect your vote and ensure your privacy.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <TrendingUp size={32} />
-            </div>
-            <h3 className="feature-title">Transparent Results</h3>
-            <p className="feature-description">Access real-time, verifiable results as soon as the election period ends.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* --- CTA SECTION --- */}
-      <section className="cta-section">
-        <div className="cta-content">
-          <h2 className="cta-title">Ready to make a difference?</h2>
-          <p className="cta-description">Join thousands of students who have already made their voices heard. Your participation strengthens our community and shapes the future of our student activity units.</p>
-          <button className="cta-btn-white" onClick={() => onNavigate("signup")}>
-            Cast Your Vote Now
-          </button>
-        </div>
-      </section>
-
-      {/* --- FOOTER --- */}
-      <footer className="footer">
-        <div className="footer-content">
-          <p className="footer-text">© 2024 E-Voting System. All Rights Reserved.</p>
-          <div className="footer-links">
-            <a href="#about" className="footer-link">
-              About Us
-            </a>
-            <a href="#privacy" className="footer-link">
-              Privacy Policy
-            </a>
-            <a href="#contact" className="footer-link">
-              Contact Support
-            </a>
-          </div>
-        </div>
-      </footer>
+      
+      {/* Sisa konten Home lainnya (Upcoming Elections, Footer, dll) biarkan saja seperti punya abang */}
     </div>
   );
 }

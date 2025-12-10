@@ -91,7 +91,7 @@ function Election({ onNavigate, showSuccessPopup = false, onPopupClose }) {
             <a href="#election" className="nav-link active" onClick={() => onNavigate("election")}>
               Elections
             </a>
-            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
+            <a href="#results" className="nav-link" onClick={() => onNavigate("results")}>
               Results
             </a>
             <a href="#help" className="nav-link">

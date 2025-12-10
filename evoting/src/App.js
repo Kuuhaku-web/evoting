@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-// Import semua komponen halaman
+
+// --- IMPORT COMPONENT ---
 import Home from "./Home";
 import Election from "./Election";
-import Result from "./Result";
+import ResultsReal from "./resultsReal"; // Pastikan file resultsReal.js isinya SUDAH DIGANTI dengan kode di atas (poin 1)
 import Help from "./Help";
 import Profile from "./Profile";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import UkmDetail from "./UkmDetail";
 import VoteConfirmation from "./VoteConfirmation";
+import Result from "./Result"; 
 
 function App() {
   const [currentPage, setCurrentPage] = useState("home");
@@ -16,27 +18,20 @@ function App() {
   const [candidateData, setCandidateData] = useState(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-   const handleResetPopup = () => {
-     // Fungsi baru untuk mereset state pop-up
-     setShowSuccessPopup(false);
-   };
+  const handleResetPopup = () => {
+    setShowSuccessPopup(false);
+  };
 
   const handleNavigate = (page, ukmName = "", candidate = null, showPopup = false) => {
-    console.log("Navigating to:", page, "UKM:", ukmName, "Candidate:", candidate, "ShowPopup:", showPopup);
-
+    console.log("Navigating to:", page);
     setCurrentPage(page);
 
-    // Update UKM name jika ada
-    if (ukmName) {
-      setSelectedUkm(ukmName);
-    }
+    // Update URL hash manual
+    if (page === "home") window.location.hash = "";
+    else window.location.hash = page;
 
-    // Update candidate data jika ada
-    if (candidate) {
-      setCandidateData(candidate);
-    }
-
-    // Update success popup flag
+    if (ukmName) setSelectedUkm(ukmName);
+    if (candidate) setCandidateData(candidate);
     setShowSuccessPopup(showPopup);
   };
 
@@ -51,63 +46,44 @@ function App() {
     };
     handleHashChange();
     window.addEventListener("hashchange", handleHashChange);
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   return (
     <div>
-      {currentPage === "home" && <Home onNavigate={setCurrentPage} />}
+      {currentPage === "home" && <Home onNavigate={handleNavigate} />}
 
-      {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} />}
-
-      {/* Halaman Election */}
       {currentPage === "election" && (
         <Election
-          onNavigate={setCurrentPage}
-          showSuccessPopup={showSuccessPopup} // Teruskan state
-          onPopupClose={handleResetPopup} // Teruskan fungsi reset
+          onNavigate={handleNavigate}
+          showSuccessPopup={showSuccessPopup}
+          onPopupClose={handleResetPopup}
         />
       )}
 
-      {currentPage === "result" && <Result onNavigate={setCurrentPage} />}
+      {/* JIKA currentPage = "results", TAMPILKAN ResultsReal */}
+      {/* Kalau isi file resultsReal.js sudah diganti (poin 1), tampilannya pasti beda sama Election */}
+      {currentPage === "results" && <ResultsReal onNavigate={handleNavigate} />}
 
-      {currentPage === "help" && <Help onNavigate={setCurrentPage} />}
-
-      {currentPage === "profile" && <Profile onNavigate={setCurrentPage} />}
-
-      {currentPage === "voteconfirmation" && candidateData && <VoteConfirmation onNavigate={handleNavigate} candidateData={candidateData} />}
+      {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} />}
+      {currentPage === "result" && <Result onNavigate={handleNavigate} />} 
+      {currentPage === "help" && <Help onNavigate={handleNavigate} />}
+      {currentPage === "profile" && <Profile onNavigate={handleNavigate} />}
+      {currentPage === "voteconfirmation" && candidateData && (
+        <VoteConfirmation onNavigate={handleNavigate} candidateData={candidateData} />
+      )}
 
       {currentPage === "signin" && (
         <SignIn
-          onSwitchToSignUp={() => {
-            setCurrentPage("signup");
-            window.location.hash = "signup";
-          }}
-          onBack={() => {
-            setCurrentPage("home");
-            window.location.hash = "";
-          }}
-          // --- PERBAIKAN 2: TAMBAHKAN BARIS INI ---
-          onNavigate={(page) => {
-            setCurrentPage(page);
-            // Opsional: Reset URL hash saat kembali ke home
-            if (page === "home") window.location.hash = "";
-          }}
+          onSwitchToSignUp={() => handleNavigate("signup")}
+          onBack={() => handleNavigate("home")}
+          onNavigate={handleNavigate}
         />
       )}
-
       {currentPage === "signup" && (
         <SignUp
-          onSwitchToSignIn={() => {
-            setCurrentPage("signin");
-            window.location.hash = "signin";
-          }}
-          onBack={() => {
-            setCurrentPage("home");
-            window.location.hash = "";
-          }}
+          onSwitchToSignIn={() => handleNavigate("signin")}
+          onBack={() => handleNavigate("home")}
         />
       )}
     </div>
