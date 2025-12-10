@@ -1,9 +1,42 @@
 // Home.js - Simpan di folder src/components/Home.js
-import React from 'react';
-import { Vote, Users, CheckSquare, Smartphone, Shield, TrendingUp, UserCircle } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Vote, Users, CheckSquare, Smartphone, Shield, TrendingUp, UserCircle, LogOut } from "lucide-react";
 import './Home.css';
 
-function Home({ onNavigate }) {
+function Home({ onNavigate, user, onAuth }) {
+  const [currentUser, setCurrentUser] = useState(user);
+
+  // Watch for user prop changes
+  useEffect(() => {
+    console.log('👁️ Home - user prop changed:', user);
+    console.log('📊 currentUser state will be:', user);
+    setCurrentUser(user);
+  }, [user]);
+
+  // Also watch localStorage for real-time updates
+  useEffect(() => {
+    const checkUserInStorage = () => {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        console.log('Home - localStorage user:', storedUser);
+        setCurrentUser(storedUser);
+      } catch (err) {
+        console.error('Error reading localStorage:', err);
+      }
+    };
+
+    const interval = setInterval(checkUserInStorage, 500); // Check every 500ms
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setCurrentUser(null);
+    if (onAuth) onAuth(null);
+    onNavigate('home');
+    window.location.hash = '';
+  };
   return (
     <div className="home-container">
       {/* Navigation */}
@@ -11,7 +44,7 @@ function Home({ onNavigate }) {
         <div className="nav-content">
           <div className="nav-brand">
             <img src="/logo1.png" alt="E-Voting Logo" className="brand-logo" />
-            <span className="brand-text">E-Voting System</span>
+            <span className="brand-text">E-Voting</span>
           </div>
           <div className="nav-links">
             <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>
@@ -26,18 +59,83 @@ function Home({ onNavigate }) {
             <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>
               Help/FAQ
             </a>
-             <button className="profile-btn" onClick={() => onNavigate("profile")}>
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
                 <UserCircle size={32} color="#1f2937" />
             </button>
 
-            <button className="login-btn" onClick={() => onNavigate("signup")}>
-              Login / Register
-            </button>
+            {currentUser ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span className="username-display" style={{
+                  color: '#4b5563',
+                  fontWeight: '600',
+                  fontSize: '0.95rem'
+                }}>
+                  {currentUser.username}
+                </span>
+                <button className="login-btn" onClick={handleLogout} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button className="login-btn" onClick={() => onNavigate("signup")}>
+                Login / Register
+              </button>
+            )}
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* TEMPORARY: Debug Section - Bisa dihapus nanti */}
+      {currentUser && (
+        <div style={{
+          backgroundColor: '#f0f9ff',
+          border: '1px solid #0ea5e9',
+          padding: '1.5rem',
+          margin: '1rem 2rem',
+          borderRadius: '8px',
+          maxWidth: '1200px',
+          marginLeft: 'auto',
+          marginRight: 'auto'
+        }}>
+          <h3 style={{ color: '#0369a1', marginBottom: '0.5rem' }}>✅ Login Status</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.95rem' }}>
+            <div>
+              <strong>Username:</strong> <span style={{ color: '#2563eb' }}>{currentUser.username}</span>
+            </div>
+            <div>
+              <strong>Email:</strong> <span style={{ color: '#2563eb' }}>{currentUser.email}</span>
+            </div>
+            <div>
+              <strong>User ID:</strong> <span style={{ color: '#2563eb', fontSize: '0.85rem' }}>{currentUser.userId}</span>
+            </div>
+            <div>
+              <strong>Profile Picture:</strong> <span style={{ color: '#2563eb' }}>{currentUser.profilePicture ? '✓ Uploaded' : '✗ Not set'}</span>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {!currentUser && (
+        <div style={{
+          backgroundColor: '#fef3c7',
+          border: '1px solid #fcd34d',
+          padding: '1.5rem',
+          margin: '1rem 2rem',
+          borderRadius: '8px',
+          maxWidth: '1200px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ color: '#92400e', marginBottom: '0.5rem' }}>⏱️ Not Logged In</h3>
+          <p style={{ color: '#78350f' }}>Please click "Login / Register" to access voting features</p>
+        </div>
+      )}
       <section className="hero-section">
         <div className="hero-content">
           <div className="hero-illustration">

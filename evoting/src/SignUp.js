@@ -80,18 +80,24 @@ function SignUp({ onSwitchToSignIn, onBack, onNavigate, onAuth }) {
       const data = await res.json();
       console.log('Sign up berhasil:', data);
 
+      // Handle both flat dan nested user structure
+      const userData = data.user || data;
+
       // Simpan user ke localStorage
       const user = {
-        userId: data.userId,
-        email: data.email,
-        username: data.username,
+        userId: userData.userId || userData._id || userData.id,
+        email: userData.email,
+        username: userData.username,
         token: data.token
       };
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', data.token);
 
       // Panggil onAuth jika ada
-      if (onAuth) onAuth(user);
+      if (onAuth) {
+        console.log('Calling onAuth with user:', user);
+        onAuth(user);
+      }
 
       // Tampilkan popup sukses
       setShowPopup(true);

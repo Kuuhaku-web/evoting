@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 // --- IMPORT COMPONENT ---
 import Home from "./Home";
@@ -17,6 +17,7 @@ function App() {
   const [selectedUkm, setSelectedUkm] = useState("");
   const [candidateData, setCandidateData] = useState(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // State user dari localStorage
   const [user, setUser] = useState(() => {
@@ -36,9 +37,49 @@ function App() {
     }
   }, [user]);
 
+  // Listen untuk changes di localStorage (dari SignIn/SignUp)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const updatedUser = JSON.parse(localStorage.getItem('user')) || null;
+        console.log('🔍 Storage event - updating user:', updatedUser);
+        setUser(updatedUser);
+      } catch (err) {
+        console.error('Error reading user from localStorage:', err);
+      }
+    };
+
+    // Listen untuk storage changes dari tab lain
+    window.addEventListener('storage', handleStorageChange);
+
+    // Also poll localStorage setiap 200ms untuk catch changes dari tab yang sama
+    const pollInterval = setInterval(() => {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (storedUser && JSON.stringify(storedUser) !== JSON.stringify(user)) {
+          console.log('📡 Polling detected new user:', storedUser);
+          setUser(storedUser);
+        }
+      } catch (err) {
+        // Ignore
+      }
+    }, 200);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(pollInterval);
+    };
+  }, [user]);
+
   const handleResetPopup = () => {
     setShowSuccessPopup(false);
   };
+
+  // Callback untuk update user state
+  const handleSetUser = useCallback((userData) => {
+    console.log('handleSetUser called with:', userData);
+    setUser(userData);
+  }, []);
 
   const handleNavigate = (page, ukmName = "", candidate = null, showPopup = false) => {
     console.log("Navigating to:", page);
@@ -69,7 +110,7 @@ function App() {
 
   return (
     <div>
-      {currentPage === "home" && <Home onNavigate={handleNavigate} />}
+      {currentPage === "home" && <Home onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
 
       {currentPage === "election" && (
         <Election
@@ -86,7 +127,7 @@ function App() {
       {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} />}
       {currentPage === "result" && <Result onNavigate={handleNavigate} />} 
       {currentPage === "help" && <Help onNavigate={handleNavigate} />}
-      {currentPage === "profile" && <Profile onNavigate={handleNavigate} user={user} onAuth={setUser} />}
+      {currentPage === "profile" && <Profile onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
       {currentPage === "voteconfirmation" && candidateData && (
         <VoteConfirmation onNavigate={handleNavigate} candidateData={candidateData} />
       )}
@@ -96,7 +137,7 @@ function App() {
           onSwitchToSignUp={() => handleNavigate("signup")}
           onBack={() => handleNavigate("home")}
           onNavigate={handleNavigate}
-          onAuth={setUser}
+          onAuth={handleSetUser}
         />
       )}
       {currentPage === "signup" && (
@@ -104,7 +145,7 @@ function App() {
           onSwitchToSignIn={() => handleNavigate("signin")}
           onBack={() => handleNavigate("home")}
           onNavigate={handleNavigate}
-          onAuth={setUser}
+          onAuth={handleSetUser}
         />
       )}
     </div>

@@ -1,15 +1,28 @@
-import React from "react";
-import { User, Mail, BookOpen, Clock, LogOut, Award } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { User, Mail, BookOpen, Clock, LogOut, Award, Upload } from "lucide-react";
 import "./Profile.css"; // Pastikan file css diimport
 
 function Profile({ onNavigate, user, onAuth }) {
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
+  const [currentUser, setCurrentUser] = useState(user);
+  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || null);
+
+  // Watch for user prop changes
+  useEffect(() => {
+    console.log('Profile - user prop changed:', user);
+    setCurrentUser(user);
+    setProfilePicture(user?.profilePicture || null);
+  }, [user]);
+
   // Gunakan data user dari props, fallback ke data dummy
-  const userData = user ? {
-    name: user.username || "User",
-    email: user.email || "email@example.com",
-    major: user.major || "Computer Science",
-    campus: user.campus || "Kemanggisan",
-    joinDate: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Sept 2021",
+  const userData = currentUser ? {
+    name: currentUser.username || "User",
+    email: currentUser.email || "email@example.com",
+    major: currentUser.major || "Computer Science",
+    campus: currentUser.campus || "Kemanggisan",
+    joinDate: currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : "Sept 2021",
   } : {
     name: "Pragos",
     nim: "2702278892",
@@ -30,6 +43,55 @@ function Profile({ onNavigate, user, onAuth }) {
     // Navigasi ke home
     if (onNavigate) onNavigate("home");
     window.location.hash = '';
+  };
+
+  const handleProfilePictureUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadLoading(true);
+    setUploadError('');
+    setUploadSuccess('');
+
+    try {
+      const formData = new FormData();
+      formData.append('profilePicture', file);
+
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:5000/api/auth/upload-profile', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || 'Upload gagal');
+      }
+
+      const data = await res.json();
+      console.log('Upload berhasil:', data);
+
+      // Update profile picture
+      const imageUrl = `http://localhost:5000${data.profilePicture}`;
+      setProfilePicture(imageUrl);
+
+      // Update user di localStorage dengan profile picture baru
+      const updatedUser = { ...currentUser, profilePicture: imageUrl };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+      if (onAuth) onAuth(updatedUser);
+
+      setUploadSuccess('Profile picture berhasil diupload!');
+      setTimeout(() => setUploadSuccess(''), 3000);
+    } catch (err) {
+      setUploadError(err.message || 'Terjadi kesalahan saat upload');
+      console.error('Upload error:', err);
+    } finally {
+      setUploadLoading(false);
+    }
   };
 
   const votingHistory = [
@@ -78,8 +140,55 @@ function Profile({ onNavigate, user, onAuth }) {
         <div className="profile-header-card">
           <div className="profile-avatar-section">
             <div className="avatar-circle">
-              <User size={64} color="white" />
+              {profilePicture ? (
+                <img src={profilePicture} alt="Profile" style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  objectFit: 'cover'
+                }} />
+              ) : (
+                <User size={64} color="white" />
+              )}
             </div>
+
+            {/* Upload Profile Picture Form */}
+            <div style={{
+              marginTop: '1.5rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem',
+              alignItems: 'center'
+            }}>
+              <label htmlFor="profile-upload" style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: '#dbeafe',
+                color: '#2563eb',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                border: 'none',
+                transition: 'background-color 0.3s'
+              }} onMouseEnter={(e) => e.target.style.backgroundColor = '#bfdbfe'} onMouseLeave={(e) => e.target.style.backgroundColor = '#dbeafe'}>
+                <Upload size={18} />
+                Upload Foto
+              </label>
+              <input
+                id="profile-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePictureUpload}
+                disabled={uploadLoading}
+                style={{ display: 'none' }}
+              />
+              {uploadLoading && <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Uploading...</p>}
+              {uploadError && <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{uploadError}</p>}
+              {uploadSuccess && <p style={{ color: '#16a34a', fontSize: '0.875rem' }}>{uploadSuccess}</p>}
+            </div>
+
             <h2 className="profile-name">{userData.name}</h2>
             <p className="profile-nim">{userData.nim}</p>
             <span className="profile-badge">Active Student</span>

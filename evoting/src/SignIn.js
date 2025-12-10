@@ -25,40 +25,61 @@ function SignIn({ onSwitchToSignUp, onNavigate, onAuth }) {
     setError('');
 
     try {
+      console.log('🔐 Starting login with:', formData);
+      
       const res = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
 
+      console.log('📍 Response status:', res.status);
+
       if (!res.ok) {
         const errData = await res.json();
+        console.log('❌ Login error response:', errData);
         throw new Error(errData.message || 'Login gagal');
       }
 
       const data = await res.json();
-      console.log('Login berhasil:', data);
+      console.log('✅ Login berhasil, response:', data);
+
+      // Handle both flat dan nested user structure
+      const userData = data.user || data; // If data.user exists, use it; otherwise use data
 
       // Simpan user ke localStorage
       const user = {
-        userId: data.userId,
-        email: data.email,
-        username: data.username,
-        profilePicture: data.profilePicture,
+        userId: userData.userId || userData._id || userData.id,
+        email: userData.email,
+        username: userData.username,
+        profilePicture: userData.profilePicture || null,
         token: data.token
       };
+      
+      console.log('💾 Saving to localStorage:', user);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', data.token);
 
-      // Panggil callback onAuth jika ada
-      if (onAuth) onAuth(user);
+      // Verify localStorage
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      console.log('✔️ Verified localStorage user:', storedUser);
 
-      // Navigasi ke home
-      onNavigate('home');
-      window.location.hash = '';
+      // Panggil callback onAuth untuk update state di App.js
+      if (onAuth) {
+        console.log('🔄 Calling onAuth with user:', user);
+        onAuth(user);
+      }
+
+      // Wait sedikit kemudian navigasi agar state terupdate
+      console.log('⏳ Waiting 500ms before navigation...');
+      setTimeout(() => {
+        console.log('🚀 Navigating to home');
+        onNavigate('home');
+        window.location.hash = '';
+      }, 500);
     } catch (err) {
       setError(err.message || 'Terjadi kesalahan saat login');
-      console.error('Login error:', err);
+      console.error('❌ Login error:', err);
     } finally {
       setLoading(false);
     }
