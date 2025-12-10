@@ -34,7 +34,7 @@ function Profile({ onNavigate }) {
             <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>
               Elections
             </a>
-            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
+            <a href="#results" className="nav-link" onClick={() => onNavigate("results")}>
               Results
             </a>
             <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>

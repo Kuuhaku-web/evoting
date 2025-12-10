@@ -49,8 +49,8 @@ function Help({ onNavigate }) {
             <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>
               Elections
             </a>
-            <a href="#result" className="nav-link" onClick={() => onNavigate("result")}>
-              Result
+            <a href="#results" className="nav-link" onClick={() => onNavigate("results")}>
+              Results
             </a>
             <a href="#help" className="nav-link active">
               Help/FAQ
