@@ -17,7 +17,6 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/auth', authRoutes);
 
 // MongoDB Connection
-// Baris 20 harusnya HANYA seperti ini:
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/evoting')
 .then(() => console.log('✅ MongoDB connected'))
 .catch(err => console.error('❌ MongoDB connection error:', err));
