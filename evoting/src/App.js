@@ -17,6 +17,24 @@ function App() {
   const [selectedUkm, setSelectedUkm] = useState("");
   const [candidateData, setCandidateData] = useState(null);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  
+  // State user dari localStorage
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user')) || null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Persist user ke localStorage setiap kali user berubah
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
 
   const handleResetPopup = () => {
     setShowSuccessPopup(false);
@@ -68,7 +86,7 @@ function App() {
       {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} />}
       {currentPage === "result" && <Result onNavigate={handleNavigate} />} 
       {currentPage === "help" && <Help onNavigate={handleNavigate} />}
-      {currentPage === "profile" && <Profile onNavigate={handleNavigate} />}
+      {currentPage === "profile" && <Profile onNavigate={handleNavigate} user={user} onAuth={setUser} />}
       {currentPage === "voteconfirmation" && candidateData && (
         <VoteConfirmation onNavigate={handleNavigate} candidateData={candidateData} />
       )}
@@ -78,12 +96,15 @@ function App() {
           onSwitchToSignUp={() => handleNavigate("signup")}
           onBack={() => handleNavigate("home")}
           onNavigate={handleNavigate}
+          onAuth={setUser}
         />
       )}
       {currentPage === "signup" && (
         <SignUp
           onSwitchToSignIn={() => handleNavigate("signin")}
           onBack={() => handleNavigate("home")}
+          onNavigate={handleNavigate}
+          onAuth={setUser}
         />
       )}
     </div>

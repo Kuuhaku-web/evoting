@@ -2,15 +2,34 @@ import React from "react";
 import { User, Mail, BookOpen, Clock, LogOut, Award } from "lucide-react";
 import "./Profile.css"; // Pastikan file css diimport
 
-function Profile({ onNavigate }) {
-  // Data Dummy Mahasiswa (Nanti bisa diganti dengan data database)
-  const userData = {
+function Profile({ onNavigate, user, onAuth }) {
+  // Gunakan data user dari props, fallback ke data dummy
+  const userData = user ? {
+    name: user.username || "User",
+    email: user.email || "email@example.com",
+    major: user.major || "Computer Science",
+    campus: user.campus || "Kemanggisan",
+    joinDate: user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Sept 2021",
+  } : {
     name: "Pragos",
     nim: "2702278892",
     major: "Computer Science",
     email: "Pragos@binus.ac.id",
     campus: "Kemanggisan",
     joinDate: "Sept 2021",
+  };
+
+  const handleLogout = () => {
+    // Hapus user dari localStorage
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    
+    // Reset user state
+    if (onAuth) onAuth(null);
+    
+    // Navigasi ke home
+    if (onNavigate) onNavigate("home");
+    window.location.hash = '';
   };
 
   const votingHistory = [
@@ -46,7 +65,7 @@ function Profile({ onNavigate }) {
               <User size={24} color="#2563eb" />
             </button>
 
-            <button className="login-btn" onClick={() => onNavigate("signin")}>
+            <button className="login-btn" onClick={handleLogout}>
               Logout
             </button>
           </div>

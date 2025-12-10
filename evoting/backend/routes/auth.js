@@ -72,12 +72,10 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        profilePicture: user.profilePicture
-      }
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -117,13 +115,11 @@ router.post('/login', async (req, res) => {
     res.json({
       message: 'Login successful',
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        walletAddress: user.walletAddress,
-        profilePicture: user.profilePicture
-      }
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+      walletAddress: user.walletAddress,
+      profilePicture: user.profilePicture
     });
   } catch (error) {
     console.error('Login error:', error);
