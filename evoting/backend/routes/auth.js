@@ -75,7 +75,8 @@ router.post('/register', async (req, res) => {
       userId: user._id,
       username: user.username,
       email: user.email,
-      profilePicture: user.profilePicture
+      profilePicture: user.profilePicture,
+      createdAt: user.createdAt
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -119,7 +120,8 @@ router.post('/login', async (req, res) => {
       username: user.username,
       email: user.email,
       walletAddress: user.walletAddress,
-      profilePicture: user.profilePicture
+      profilePicture: user.profilePicture,
+      createdAt: user.createdAt
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -156,6 +158,23 @@ router.post('/upload-profile', authMiddleware, upload.single('profilePicture'), 
     });
   } catch (error) {
     console.error('Upload error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete profile picture
+router.post('/delete-profile-picture', authMiddleware, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.userId, {
+      profilePicture: null
+    });
+
+    res.json({
+      message: 'Profile picture deleted successfully',
+      profilePicture: null
+    });
+  } catch (error) {
+    console.error('Delete error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

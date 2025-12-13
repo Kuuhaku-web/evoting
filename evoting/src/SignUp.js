@@ -88,6 +88,8 @@ function SignUp({ onSwitchToSignIn, onBack, onNavigate, onAuth }) {
         userId: userData.userId || userData._id || userData.id,
         email: userData.email,
         username: userData.username,
+        profilePicture: userData.profilePicture || null,
+        createdAt: userData.createdAt,
         token: data.token
       };
       localStorage.setItem('user', JSON.stringify(user));

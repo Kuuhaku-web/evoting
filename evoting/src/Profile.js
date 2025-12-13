@@ -12,6 +12,7 @@ function Profile({ onNavigate, user, onAuth }) {
   // Watch for user prop changes
   useEffect(() => {
     console.log('Profile - user prop changed:', user);
+    console.log('Profile - user.createdAt:', user?.createdAt);
     setCurrentUser(user);
     setProfilePicture(user?.profilePicture || null);
   }, [user]);
@@ -22,7 +23,7 @@ function Profile({ onNavigate, user, onAuth }) {
     email: currentUser.email || "email@example.com",
     major: currentUser.major || "Computer Science",
     campus: currentUser.campus || "Kemanggisan",
-    joinDate: currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : "Sept 2021",
+    joinDate: currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : "Sept 2021",
   } : {
     name: "Pragos",
     nim: "2702278892",
@@ -89,6 +90,48 @@ function Profile({ onNavigate, user, onAuth }) {
     } catch (err) {
       setUploadError(err.message || 'Terjadi kesalahan saat upload');
       console.error('Upload error:', err);
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  const handleDeleteProfilePicture = async () => {
+    setUploadLoading(true);
+    setUploadError('');
+    setUploadSuccess('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:5000/api/auth/delete-profile-picture', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Delete gagal');
+      }
+
+      console.log('Delete berhasil:', data);
+
+      // Clear profile picture
+      setProfilePicture(null);
+
+      // Update user di localStorage
+      const updatedUser = { ...currentUser, profilePicture: null };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setCurrentUser(updatedUser);
+      if (onAuth) onAuth(updatedUser);
+
+      setUploadSuccess('Profile picture berhasil dihapus!');
+      setTimeout(() => setUploadSuccess(''), 3000);
+    } catch (err) {
+      setUploadError(err.message || 'Terjadi kesalahan saat delete');
+      console.error('Delete error:', err);
     } finally {
       setUploadLoading(false);
     }
@@ -206,7 +249,35 @@ function Profile({ onNavigate, user, onAuth }) {
                 disabled={uploadLoading}
                 style={{ display: 'none' }}
               />
-              {uploadLoading && <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Uploading...</p>}
+              
+              {/* Delete Button */}
+              {profilePicture && (
+                <button
+                  onClick={handleDeleteProfilePicture}
+                  disabled={uploadLoading}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    backgroundColor: '#fee2e2',
+                    color: '#dc2626',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '6px',
+                    cursor: uploadLoading ? 'not-allowed' : 'pointer',
+                    fontWeight: '600',
+                    border: 'none',
+                    transition: 'background-color 0.3s',
+                    opacity: uploadLoading ? 0.6 : 1
+                  }}
+                  onMouseEnter={(e) => !uploadLoading && (e.target.style.backgroundColor = '#fecaca')}
+                  onMouseLeave={(e) => !uploadLoading && (e.target.style.backgroundColor = '#fee2e2')}
+                >
+                  <LogOut size={18} />
+                  Hapus Foto
+                </button>
+              )}
+              
+              {uploadLoading && <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Processing...</p>}
               {uploadError && <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{uploadError}</p>}
               {uploadSuccess && <p style={{ color: '#16a34a', fontSize: '0.875rem' }}>{uploadSuccess}</p>}
             </div>

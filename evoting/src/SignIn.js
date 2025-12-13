@@ -53,6 +53,7 @@ function SignIn({ onSwitchToSignUp, onNavigate, onAuth }) {
         email: userData.email,
         username: userData.username,
         profilePicture: userData.profilePicture || null,
+        createdAt: userData.createdAt,
         token: data.token
       };
       
