@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Mail, BookOpen, Clock, LogOut, Award, Upload } from "lucide-react";
+import { User, Mail, BookOpen, Clock, LogOut, Award, Upload, UserCircle } from "lucide-react";
 import "./Profile.css"; // Pastikan file css diimport
 
 function Profile({ onNavigate, user, onAuth }) {
@@ -122,14 +122,36 @@ function Profile({ onNavigate, user, onAuth }) {
               Help/FAQ
             </a>
 
-            {/* Tombol Profile Aktif */}
-            <button className="profile-btn active" onClick={() => onNavigate("profile")}>
-              <User size={24} color="#2563eb" />
+            {/* Profile Icon */}
+            <button className="profile-btn" onClick={() => onNavigate("profile")}>
+              <UserCircle size={32} color="#1f2937" />
             </button>
 
-            <button className="login-btn" onClick={handleLogout}>
-              Logout
-            </button>
+            {/* Logout Button */}
+            {currentUser ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span className="username" style={{
+                  color: '#4b5563',
+                  fontWeight: '600',
+                  fontSize: '0.95rem'
+                }}>
+                  {currentUser.username}
+                </span>
+                <button className="login-btn" onClick={handleLogout} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: '#ef4444'
+                }}>
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button className="login-btn" onClick={() => onNavigate("signup")}>
+                Login / Register
+              </button>
+            )}
           </div>
         </div>
       </nav>
