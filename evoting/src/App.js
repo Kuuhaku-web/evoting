@@ -127,7 +127,7 @@ function App() {
       {currentPage === "results" && <ResultsReal onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
 
       {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} user={user} onAuth={handleSetUser} />}
-      {currentPage === "result" && <Result onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />} 
+      {currentPage === "result" && <Result onNavigate={handleNavigate} ukmName={selectedUkm} user={user} onAuth={handleSetUser} />} 
       {currentPage === "help" && <Help onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
       {currentPage === "profile" && <Profile onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
       {currentPage === "voteconfirmation" && candidateData && (

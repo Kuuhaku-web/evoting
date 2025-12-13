@@ -59,17 +59,24 @@ function ResultsReal({ onNavigate, user, onAuth }) {
             // Destructure data dari struct
             const [id, name, description, isActive, totalVotes, candidateCount] = categoryData;
 
-            categories.push({
-              id: Number(id),
-              name: name,
-              description: description,
-              isActive: isActive,
-              totalVotes: Number(totalVotes),
-              candidateCount: Number(candidateCount),
-              color: COLORS[i % COLORS.length]
-            });
+            const totalVotesNumber = Number(totalVotes);
 
-            console.log(`✅ Kategori ${i}: ${name} - ${Number(totalVotes)} suara`);
+            // FILTERING: Hanya masukkan UKM yang sudah ada votes
+            if (totalVotesNumber > 0) {
+              categories.push({
+                id: Number(id),
+                name: name,
+                description: description,
+                isActive: isActive,
+                totalVotes: totalVotesNumber,
+                candidateCount: Number(candidateCount),
+                color: COLORS[i % COLORS.length]
+              });
+
+              console.log(`✅ Kategori ${i}: ${name} - ${totalVotesNumber} suara (DITAMPILKAN)`);
+            } else {
+              console.log(`⏭️ Kategori ${i}: ${name} - ${totalVotesNumber} suara (DILEWATI - belum ada votes)`);
+            }
           } catch (err) {
             console.error(`❌ Error fetching kategori ${i}:`, err);
           }
@@ -77,6 +84,8 @@ function ResultsReal({ onNavigate, user, onAuth }) {
 
         setUkmList(categories);
         console.log("✅ Data blockchain berhasil dimuat:", categories);
+        console.log(`📊 Total UKM dengan votes: ${categories.length}`);
+
 
       } catch (err) {
         console.error("❌ Error mengambil data blockchain:", err);
@@ -169,51 +178,68 @@ function ResultsReal({ onNavigate, user, onAuth }) {
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", 
             gap: "25px" 
           }}>
-            {ukmList.map((ukm) => (
-              <div 
-                key={ukm.id}
-                onClick={() => onNavigate("result")} // <--- INI KUNCINYA: Klik lari ke Result.js
-                style={{
-                  backgroundColor: "white",
-                  padding: "25px",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                  cursor: "pointer",
-                  transition: "all 0.3s ease",
-                  borderTop: `6px solid ${ukm.color}`,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between"
-                }}
-                // Efek Hover pakai inline style react event
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-5px)";
-                  e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
-                }}
-              >
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-                    <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", color: "#111827", margin: 0 }}>
-                      {ukm.name}
-                    </h3>
-                    <BarChart2 size={24} color={ukm.color} />
+            {ukmList.length > 0 ? (
+              ukmList.map((ukm) => (
+                <div 
+                  key={ukm.id}
+                  onClick={() => onNavigate("result", ukm.name)} // Pass nama UKM ke Result page
+                  style={{
+                    backgroundColor: "white",
+                    padding: "25px",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    borderTop: `6px solid ${ukm.color}`,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between"
+                  }}
+                  // Efek Hover pakai inline style react event
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
+                  }}
+                >
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
+                      <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", color: "#111827", margin: 0 }}>
+                        {ukm.name}
+                      </h3>
+                      <BarChart2 size={24} color={ukm.color} />
+                    </div>
+                    <p style={{ color: "#6b7280", fontSize: "0.95rem" }}>
+                      Status: <span style={{ color: "#10b981", fontWeight: "600" }}>Live Counting</span>
+                    </p>
                   </div>
-                  <p style={{ color: "#6b7280", fontSize: "0.95rem" }}>
-                    Status: <span style={{ color: "#10b981", fontWeight: "600" }}>Live Counting</span>
-                  </p>
+                  
+                  <div style={{ marginTop: "20px", borderTop: "1px solid #f3f4f6", paddingTop: "15px" }}>
+                    <span style={{ color: "#3b82f6", fontWeight: "600", fontSize: "1.1rem", display: "flex", alignItems: "center", gap: "5px" }}>
+                      📊 {ukm.totalVotes} suara
+                    </span>
+                    <span style={{ color: "#6b7280", fontWeight: "500", fontSize: "0.9rem", display: "flex", alignItems: "center", gap: "5px", marginTop: "8px" }}>
+                      Lihat Detail Kandidat &rarr;
+                    </span>
+                  </div>
                 </div>
-                
-                <div style={{ marginTop: "20px", borderTop: "1px solid #f3f4f6", paddingTop: "15px" }}>
-                  <span style={{ color: "#3b82f6", fontWeight: "600", fontSize: "0.9rem", display: "flex", alignItems: "center", gap: "5px" }}>
-                    Lihat Grafik Detail &rarr;
-                  </span>
-                </div>
+              ))
+            ) : (
+              <div style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "60px 20px",
+                backgroundColor: "#f3f4f6",
+                borderRadius: "12px",
+                color: "#6b7280"
+              }}>
+                <p style={{ fontSize: "1.1rem", marginBottom: "10px" }}>📭 Belum ada UKM dengan suara</p>
+                <p style={{ fontSize: "0.95rem" }}>Proses voting masih berlangsung. Silakan kembali lagi nanti untuk melihat hasilnya.</p>
               </div>
-            ))}
+            )}
           </div>
 
         </div>
