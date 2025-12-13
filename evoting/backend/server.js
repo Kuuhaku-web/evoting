@@ -8,6 +8,8 @@ const authRoutes = require('./routes/auth');
 
 dotenv.config();
 
+console.log('📝 MONGODB_URI:', process.env.MONGODB_URI ? 'Set' : 'NOT SET');
+
 const app = express();
 
 // Create uploads folder jika belum ada

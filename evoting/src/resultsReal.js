@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { UserCircle, BarChart2, LogOut } from "lucide-react";
-import "./Home.css"; // Pakai CSS Home biar Navbarnya konsisten
+import { BrowserProvider, Contract } from "ethers";
+import "./Home.css";
+import BinusUKMVotingABI from "./utils/BinusUKMVoting.json";
+
+const CONTRACT_ADDRESS = "0x928F125a5e2a633CACbc3C65dA60f19ac4D11323";
+const COLORS = ["#6366f1", "#ec4899", "#10b981", "#f59e0b", "#8b5cf6", "#3b82f6", "#06b6d4", "#14b8a6"];
 
 function ResultsReal({ onNavigate, user, onAuth }) {
   const [currentUser, setCurrentUser] = useState(user);
+  const [ukmList, setUkmList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setCurrentUser(user);
@@ -17,15 +25,76 @@ function ResultsReal({ onNavigate, user, onAuth }) {
     onNavigate('home');
     window.location.hash = '';
   };
-  // Data UKM yang akan ditampilkan sebagai tombol/kartu
-  const ukmList = [
-    { id: 1, name: "Badminton", totalVotes: 150, color: "#6366f1" },
-    { id: 2, name: "Basketball", totalVotes: 120, color: "#ec4899" },
-    { id: 3, name: "Binusian Gaming", totalVotes: 200, color: "#10b981" },
-    { id: 4, name: "Sepakbola", totalVotes: 90, color: "#f59e0b" },
-    { id: 5, name: "Musik", totalVotes: 60, color: "#8b5cf6" },
-    { id: 6, name: "B-Preneur", totalVotes: 45, color: "#3b82f6" },
-  ];
+
+  // Fetch data dari blockchain
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Check if window.ethereum exists
+        if (!window.ethereum) {
+          throw new Error("MetaMask atau wallet browser tidak terdeteksi. Silakan install MetaMask.");
+        }
+
+        // Setup provider dan contract
+        const provider = new BrowserProvider(window.ethereum);
+        const contract = new Contract(CONTRACT_ADDRESS, BinusUKMVotingABI, provider);
+
+        console.log("📡 Mengambil data kategori dari blockchain...");
+
+        // Get total categories
+        const categoryCount = await contract.categoryCount();
+        const totalCategories = Number(categoryCount);
+
+        console.log(`✅ Total UKM/Kategori: ${totalCategories}`);
+
+        // Fetch setiap kategori
+        const categories = [];
+        for (let i = 1; i <= totalCategories; i++) {
+          try {
+            const categoryData = await contract.getCategory(i);
+            
+            // Destructure data dari struct
+            const [id, name, description, isActive, totalVotes, candidateCount] = categoryData;
+
+            categories.push({
+              id: Number(id),
+              name: name,
+              description: description,
+              isActive: isActive,
+              totalVotes: Number(totalVotes),
+              candidateCount: Number(candidateCount),
+              color: COLORS[i % COLORS.length]
+            });
+
+            console.log(`✅ Kategori ${i}: ${name} - ${Number(totalVotes)} suara`);
+          } catch (err) {
+            console.error(`❌ Error fetching kategori ${i}:`, err);
+          }
+        }
+
+        setUkmList(categories);
+        console.log("✅ Data blockchain berhasil dimuat:", categories);
+
+      } catch (err) {
+        console.error("❌ Error mengambil data blockchain:", err);
+        setError(err.message || "Gagal mengambil data dari blockchain");
+        
+        // Fallback ke data dummy
+        setUkmList([
+          { id: 1, name: "Badminton", totalVotes: 150, color: "#6366f1", description: "Badminton Club" },
+          { id: 2, name: "Basketball", totalVotes: 120, color: "#ec4899", description: "Basketball Team" },
+          { id: 3, name: "Binusian Gaming", totalVotes: 200, color: "#10b981", description: "Gaming Community" },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="home-container">
