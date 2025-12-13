@@ -172,20 +172,27 @@ function Profile({ onNavigate, user, onAuth }) {
 
             {/* Logout Button */}
             {currentUser ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <span className="username" style={{
-                  color: '#4b5563',
-                  fontWeight: '600',
-                  fontSize: '0.95rem'
-                }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <span
+                  className="username"
+                  style={{
+                    color: "#4b5563",
+                    fontWeight: "600",
+                    fontSize: "0.95rem",
+                  }}
+                >
                   {currentUser.username}
                 </span>
-                <button className="login-btn" onClick={handleLogout} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  backgroundColor: '#ef4444'
-                }}>
+                <button
+                  className="login-btn"
+                  onClick={handleLogout}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    backgroundColor: "#ef4444",
+                  }}
+                >
                   <LogOut size={18} />
                   Logout
                 </button>
@@ -206,80 +213,84 @@ function Profile({ onNavigate, user, onAuth }) {
           <div className="profile-avatar-section">
             <div className="avatar-circle">
               {profilePicture ? (
-                <img src={profilePicture} alt="Profile" style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }} />
+                <img
+                  src={profilePicture}
+                  alt="Profile"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
               ) : (
                 <User size={64} color="white" />
               )}
             </div>
 
             {/* Upload Profile Picture Form */}
-            <div style={{
-              marginTop: '1.5rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.5rem',
-              alignItems: 'center'
-            }}>
-              <label htmlFor="profile-upload" style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                backgroundColor: '#dbeafe',
-                color: '#2563eb',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                border: 'none',
-                transition: 'background-color 0.3s'
-              }} onMouseEnter={(e) => e.target.style.backgroundColor = '#bfdbfe'} onMouseLeave={(e) => e.target.style.backgroundColor = '#dbeafe'}>
+            <div
+              style={{
+                marginTop: "1.5rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                alignItems: "center",
+              }}
+            >
+              <label
+                htmlFor="profile-upload"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  backgroundColor: "#dbeafe",
+                  color: "#2563eb",
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  border: "none",
+                  transition: "background-color 0.3s",
+                }}
+                onMouseEnter={(e) => (e.target.style.backgroundColor = "#bfdbfe")}
+                onMouseLeave={(e) => (e.target.style.backgroundColor = "#dbeafe")}
+              >
                 <Upload size={18} />
                 Upload Foto
               </label>
-              <input
-                id="profile-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleProfilePictureUpload}
-                disabled={uploadLoading}
-                style={{ display: 'none' }}
-              />
-              
+              <input id="profile-upload" type="file" accept="image/*" onChange={handleProfilePictureUpload} disabled={uploadLoading} style={{ display: "none" }} />
+
               {/* Delete Button */}
               {profilePicture && (
                 <button
                   onClick={handleDeleteProfilePicture}
                   disabled={uploadLoading}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    backgroundColor: '#fee2e2',
-                    color: '#dc2626',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '6px',
-                    cursor: uploadLoading ? 'not-allowed' : 'pointer',
-                    fontWeight: '600',
-                    border: 'none',
-                    transition: 'background-color 0.3s',
-                    opacity: uploadLoading ? 0.6 : 1
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    backgroundColor: "#fee2e2",
+                    color: "#dc2626",
+                    padding: "0.75rem 1.5rem",
+                    borderRadius: "6px",
+                    cursor: uploadLoading ? "not-allowed" : "pointer",
+                    fontWeight: "600",
+                    border: "none",
+                    transition: "background-color 0.3s",
+                    opacity: uploadLoading ? 0.6 : 1,
                   }}
-                  onMouseEnter={(e) => !uploadLoading && (e.target.style.backgroundColor = '#fecaca')}
-                  onMouseLeave={(e) => !uploadLoading && (e.target.style.backgroundColor = '#fee2e2')}
+                  onMouseEnter={(e) => !uploadLoading && (e.target.style.backgroundColor = "#fecaca")}
+                  onMouseLeave={(e) => !uploadLoading && (e.target.style.backgroundColor = "#fee2e2")}
                 >
                   <LogOut size={18} />
                   Hapus Foto
                 </button>
               )}
-              
-              {uploadLoading && <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Processing...</p>}
-              {uploadError && <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{uploadError}</p>}
-              {uploadSuccess && <p style={{ color: '#16a34a', fontSize: '0.875rem' }}>{uploadSuccess}</p>}
+
+              {uploadLoading && <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>Processing...</p>}
+              {uploadError && <p style={{ color: "#dc2626", fontSize: "0.875rem" }}>{uploadError}</p>}
+              {uploadSuccess && <p style={{ color: "#16a34a", fontSize: "0.875rem" }}>{uploadSuccess}</p>}
             </div>
 
             <h2 className="profile-name">{userData.name}</h2>
@@ -340,6 +351,24 @@ function Profile({ onNavigate, user, onAuth }) {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-content">
+          <p className="footer-text">© 2024 E-Voting System. All Rights Reserved.</p>
+          <div className="footer-links">
+            <a href="#about" className="footer-link">
+              About Us
+            </a>
+            <a href="#privacy" className="footer-link">
+              Privacy Policy
+            </a>
+            <a href="#contact" className="footer-link">
+              Contact Support
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
