@@ -1,52 +1,143 @@
 import React, { useState, useEffect } from "react";
 import { User, Mail, BookOpen, Clock, LogOut, Award, Upload, UserCircle } from "lucide-react";
-import "./Profile.css"; // Pastikan file css diimport
+import { BrowserProvider, Contract } from "ethers";
+import "./Profile.css";
+import BinusUKMVotingABI from "./utils/BinusUKMVoting.json";
 
-function Profile({ onNavigate, user, onAuth }) {
+const CONTRACT_ADDRESS = "0x928F125a5e2a633CACbc3C65dA60f19ac4D11323";
+
+// Mapping Category ID ke UKM Name
+const CATEGORY_ID_TO_UKM_NAME = {
+  1: "Badminton",
+  2: "Basketball",
+  3: "Binusian Gaming",
+  4: "Sepakbola",
+  5: "Musik",
+  6: "B-Preneur",
+  7: "KMBD",
+  8: "Wushu",
+};
+
+function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
   const [currentUser, setCurrentUser] = useState(user);
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture || null);
+  const [votingHistory, setVotingHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState(null);
 
   // Watch for user prop changes
   useEffect(() => {
     console.log('Profile - user prop changed:', user);
-    console.log('Profile - user.createdAt:', user?.createdAt);
     setCurrentUser(user);
     setProfilePicture(user?.profilePicture || null);
   }, [user]);
 
-  // Gunakan data user dari props, fallback ke data dummy
-  const userData = currentUser ? {
-    name: currentUser.username || "User",
-    email: currentUser.email || "email@example.com",
-    major: currentUser.major || "Computer Science",
-    campus: currentUser.campus || "Kemanggisan",
-    joinDate: currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : "Sept 2021",
-  } : {
-    name: "Pragos",
-    nim: "2702278892",
-    major: "Computer Science",
-    email: "Pragos@binus.ac.id",
-    campus: "Kemanggisan",
-    joinDate: "Sept 2021",
-  };
+  // ===== FETCH VOTING HISTORY DARI BLOCKCHAIN =====
+  useEffect(() => {
+    if (!isLoggedIn) {
+      console.log('User not logged in, skipping voting history fetch');
+      setVotingHistory([]);
+      return;
+    }
 
+    const fetchVotingHistory = async () => {
+      try {
+        setLoadingHistory(true);
+        setHistoryError(null);
+
+        console.log("📡 Fetching voting history from blockchain...");
+
+        // Check MetaMask
+        if (!window.ethereum) {
+          throw new Error("MetaMask tidak terdeteksi. Silakan install MetaMask untuk melihat riwayat voting.");
+        }
+
+        // Setup provider
+        const provider = new BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const walletAddress = await signer.getAddress();
+        const contract = new Contract(CONTRACT_ADDRESS, BinusUKMVotingABI, provider);
+
+        console.log("✅ Connected to MetaMask");
+        console.log("📍 Wallet Address:", walletAddress);
+
+        // Get total categories
+        const categoryCount = await contract.categoryCount();
+        const totalCategories = Number(categoryCount);
+        console.log(`✅ Total Categories: ${totalCategories}`);
+
+        const history = [];
+
+        // Loop semua kategori
+        for (let categoryId = 1; categoryId <= totalCategories; categoryId++) {
+          try {
+            // STEP 1: Cek apakah user sudah vote di kategori ini
+            const hasVoted = await contract.hasUserVoted(walletAddress, categoryId);
+
+            if (hasVoted) {
+              console.log(`✅ User voted in category ${categoryId}`);
+
+              // STEP 2: Ambil candidateId yang dipilih
+              const candidateId = await contract.getUserVote(walletAddress, categoryId);
+              console.log(`   Candidate ID: ${Number(candidateId)}`);
+
+              // STEP 3: Ambil nama UKM dari kategori
+              const categoryData = await contract.getCategory(categoryId);
+              const ukmName = categoryData[1]; // Index 1 = name
+              console.log(`   UKM Name: ${ukmName}`);
+
+              // STEP 4: Ambil nama kandidat
+              const candidateData = await contract.getCandidate(candidateId);
+              const candidateName = candidateData[1]; // Index 1 = name
+              console.log(`   Candidate Name: ${candidateName}`);
+
+              // STEP 5: Tambah ke history array
+              history.push({
+                id: categoryId,
+                event: `Pemilihan Ketua ${ukmName}`,
+                choice: candidateName,
+                date: new Date().toLocaleDateString('id-ID', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                }),
+                status: "Selesai",
+                ukmName: ukmName,
+                candidateName: candidateName
+              });
+            }
+          } catch (err) {
+            console.error(`❌ Error fetching vote for category ${categoryId}:`, err);
+          }
+        }
+
+        console.log("✅ Voting history loaded:", history);
+        setVotingHistory(history);
+
+      } catch (err) {
+        console.error("❌ Error fetching voting history:", err);
+        setHistoryError(err.message || "Gagal mengambil riwayat voting");
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    fetchVotingHistory();
+  }, [isLoggedIn]);
+
+
+  // ===== HANDLE LOGOUT =====
   const handleLogout = () => {
-    // Hapus user dari localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    
-    // Reset user state
-    if (onAuth) onAuth(null);
-    
-    // Navigasi ke home
-    if (onNavigate) onNavigate("home");
-    window.location.hash = '';
+    console.log("🔐 Logout clicked");
+    if (onLogout) {
+      onLogout();
+    }
   };
 
-  const handleProfilePictureUpload = async (e) => {
+  const handleProfilePictureChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -56,319 +147,204 @@ function Profile({ onNavigate, user, onAuth }) {
 
     try {
       const formData = new FormData();
-      formData.append('profilePicture', file);
+      formData.append('file', file);
 
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/auth/upload-profile', {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/upload-profile`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
         body: formData
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Upload gagal');
-      }
+      if (!response.ok) throw new Error('Upload failed');
 
-      const data = await res.json();
-      console.log('Upload berhasil:', data);
+      const data = await response.json();
+      const newProfileUrl = data.profilePictureUrl;
+      setProfilePicture(newProfileUrl);
+      setUploadSuccess('Foto profil berhasil diperbarui!');
 
-      // Update profile picture
-      const imageUrl = `http://localhost:5000${data.profilePicture}`;
-      setProfilePicture(imageUrl);
-
-      // Update user di localStorage dengan profile picture baru
-      const updatedUser = { ...currentUser, profilePicture: imageUrl };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setCurrentUser(updatedUser);
-      if (onAuth) onAuth(updatedUser);
-
-      setUploadSuccess('Profile picture berhasil diupload!');
       setTimeout(() => setUploadSuccess(''), 3000);
     } catch (err) {
-      setUploadError(err.message || 'Terjadi kesalahan saat upload');
       console.error('Upload error:', err);
+      setUploadError('Gagal mengupload foto profil');
+      setTimeout(() => setUploadError(''), 3000);
     } finally {
       setUploadLoading(false);
     }
   };
 
-  const handleDeleteProfilePicture = async () => {
-    setUploadLoading(true);
-    setUploadError('');
-    setUploadSuccess('');
-
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/auth/delete-profile-picture', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Delete gagal');
-      }
-
-      console.log('Delete berhasil:', data);
-
-      // Clear profile picture
-      setProfilePicture(null);
-
-      // Update user di localStorage
-      const updatedUser = { ...currentUser, profilePicture: null };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setCurrentUser(updatedUser);
-      if (onAuth) onAuth(updatedUser);
-
-      setUploadSuccess('Profile picture berhasil dihapus!');
-      setTimeout(() => setUploadSuccess(''), 3000);
-    } catch (err) {
-      setUploadError(err.message || 'Terjadi kesalahan saat delete');
-      console.error('Delete error:', err);
-    } finally {
-      setUploadLoading(false);
-    }
-  };
-
-  const votingHistory = [
-    { id: 1, event: "Pemilihan Ketua HIMTI 2024", choice: "Calon 02 - Budi Santoso", date: "12 Oct 2023", status: "Selesai" },
-    { id: 2, event: "Pemilihan Ketua UKM Gaming", choice: "Calon 01 - Siti Herbert", date: "15 Nov 2023", status: "Selesai" },
-  ];
-
-  return (
-    <div className="profile-page">
-      {/* --- NAVBAR (Dicopy agar konsisten) --- */}
-      <nav className="navbar">
-        <div className="nav-content">
-          <div className="nav-brand">
-            <img src="/logo1.png" alt="Logo" className="brand-logo" />
-            <span className="brand-text">E-Voting</span>
-          </div>
-          <div className="nav-links">
-            <a href="#home" className="nav-link" onClick={() => onNavigate("home")}>
-              Home
-            </a>
-            <a href="#election" className="nav-link" onClick={() => onNavigate("election")}>
-              Elections
-            </a>
-            <a href="#results" className="nav-link" onClick={() => onNavigate("results")}>
-              Results
-            </a>
-            <a href="#help" className="nav-link" onClick={() => onNavigate("help")}>
-              Help/FAQ
-            </a>
-
-            {/* Profile Icon */}
-            <button className="profile-btn" onClick={() => onNavigate("profile")}>
-              <UserCircle size={32} color="#1f2937" />
-            </button>
-
-            {/* Logout Button */}
-            {currentUser ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                <span
-                  className="username"
-                  style={{
-                    color: "#4b5563",
-                    fontWeight: "600",
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  {currentUser.username}
-                </span>
-                <button
-                  className="login-btn"
-                  onClick={handleLogout}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    backgroundColor: "#ef4444",
-                  }}
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <button className="login-btn" onClick={() => onNavigate("signup")}>
-                Login / Register
-              </button>
-            )}
-          </div>
-        </div>
-      </nav>
-
-      {/* --- KONTEN PROFILE --- */}
+  // ===== JIKA BELUM LOGIN - TAMPILKAN GUEST UI =====
+  if (!isLoggedIn) {
+    return (
       <div className="profile-container">
-        {/* Kartu Identitas Utama */}
-        <div className="profile-header-card">
-          <div className="profile-avatar-section">
-            <div className="avatar-circle">
-              {profilePicture ? (
-                <img
-                  src={profilePicture}
-                  alt="Profile"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
-                />
-              ) : (
-                <User size={64} color="white" />
-              )}
-            </div>
-
-            {/* Upload Profile Picture Form */}
-            <div
-              style={{
-                marginTop: "1.5rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-                alignItems: "center",
-              }}
-            >
-              <label
-                htmlFor="profile-upload"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  backgroundColor: "#dbeafe",
-                  color: "#2563eb",
-                  padding: "0.75rem 1.5rem",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  border: "none",
-                  transition: "background-color 0.3s",
-                }}
-                onMouseEnter={(e) => (e.target.style.backgroundColor = "#bfdbfe")}
-                onMouseLeave={(e) => (e.target.style.backgroundColor = "#dbeafe")}
-              >
-                <Upload size={18} />
-                Upload Foto
-              </label>
-              <input id="profile-upload" type="file" accept="image/*" onChange={handleProfilePictureUpload} disabled={uploadLoading} style={{ display: "none" }} />
-
-              {/* Delete Button */}
-              {profilePicture && (
-                <button
-                  onClick={handleDeleteProfilePicture}
-                  disabled={uploadLoading}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    backgroundColor: "#fee2e2",
-                    color: "#dc2626",
-                    padding: "0.75rem 1.5rem",
-                    borderRadius: "6px",
-                    cursor: uploadLoading ? "not-allowed" : "pointer",
-                    fontWeight: "600",
-                    border: "none",
-                    transition: "background-color 0.3s",
-                    opacity: uploadLoading ? 0.6 : 1,
-                  }}
-                  onMouseEnter={(e) => !uploadLoading && (e.target.style.backgroundColor = "#fecaca")}
-                  onMouseLeave={(e) => !uploadLoading && (e.target.style.backgroundColor = "#fee2e2")}
-                >
-                  <LogOut size={18} />
-                  Hapus Foto
-                </button>
-              )}
-
-              {uploadLoading && <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>Processing...</p>}
-              {uploadError && <p style={{ color: "#dc2626", fontSize: "0.875rem" }}>{uploadError}</p>}
-              {uploadSuccess && <p style={{ color: "#16a34a", fontSize: "0.875rem" }}>{uploadSuccess}</p>}
-            </div>
-
-            <h2 className="profile-name">{userData.name}</h2>
-            <p className="profile-nim">{userData.nim}</p>
-            <span className="profile-badge">Active Student</span>
-          </div>
-
-          <div className="profile-details-grid">
-            <div className="detail-item">
-              <Mail size={18} className="detail-icon" />
-              <div>
-                <label>Email Binus</label>
-                <p>{userData.email}</p>
-              </div>
-            </div>
-            <div className="detail-item">
-              <BookOpen size={18} className="detail-icon" />
-              <div>
-                <label>Jurusan</label>
-                <p>{userData.major}</p>
-              </div>
-            </div>
-            <div className="detail-item">
-              <Award size={18} className="detail-icon" />
-              <div>
-                <label>Kampus</label>
-                <p>{userData.campus}</p>
-              </div>
-            </div>
-            <div className="detail-item">
-              <Clock size={18} className="detail-icon" />
-              <div>
-                <label>Bergabung</label>
-                <p>{userData.joinDate}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Riwayat Voting */}
-        <div className="history-section">
-          <h3>Riwayat Voting Anda</h3>
-          <div className="history-list">
-            {votingHistory.map((item) => (
-              <div key={item.id} className="history-card">
-                <div className="history-info">
-                  <h4>{item.event}</h4>
-                  <p>
-                    Pilihan: <strong>{item.choice}</strong>
-                  </p>
-                </div>
-                <div className="history-meta">
-                  <span className="date">{item.date}</span>
-                  <span className="status-badge">{item.status}</span>
-                </div>
-              </div>
-            ))}
+        <div className="profile-guest-card">
+          <UserCircle size={80} className="guest-icon" />
+          <h2>Pengguna Tamu</h2>
+          <p className="guest-message">Silakan login untuk melihat profil lengkap dan riwayat voting Anda</p>
+          
+          <button 
+            className="btn btn-primary login-button"
+            onClick={() => {
+              console.log("Guest user clicking Login Sekarang");
+              onNavigate("signin");
+            }}
+          >
+            <User size={18} /> Login Sekarang
+          </button>
+          
+          <div className="guest-benefits">
+            <h3>Keuntungan Login:</h3>
+            <ul>
+              <li>✓ Lihat profil lengkap Anda</li>
+              <li>✓ Riwayat voting dari blockchain</li>
+              <li>✓ Kelola preferensi akun</li>
+              <li>✓ Upload foto profil</li>
+            </ul>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-content">
-          <p className="footer-text">© 2024 E-Voting System. All Rights Reserved.</p>
-          <div className="footer-links">
-            <a href="#about" className="footer-link">
-              About Us
-            </a>
-            <a href="#privacy" className="footer-link">
-              Privacy Policy
-            </a>
-            <a href="#contact" className="footer-link">
-              Contact Support
-            </a>
+  // ===== JIKA SUDAH LOGIN - TAMPILKAN PROFIL LENGKAP =====
+  return (
+    <div className="profile-container">
+      <div className="profile-card">
+        {/* Profile Header */}
+        <div className="profile-header">
+          <div className="profile-picture-container">
+            {profilePicture ? (
+              <img 
+                src={profilePicture} 
+                alt="Profile" 
+                className="profile-picture"
+              />
+            ) : (
+              <div className="profile-picture-placeholder">
+                <User size={64} />
+              </div>
+            )}
+            <label htmlFor="picture-input" className="picture-upload-btn">
+              <Upload size={16} />
+              <input 
+                id="picture-input"
+                type="file" 
+                accept="image/*" 
+                onChange={handleProfilePictureChange}
+                disabled={uploadLoading}
+                style={{ display: 'none' }}
+              />
+            </label>
+          </div>
+
+          <div className="profile-info">
+            <h1>{currentUser?.name || currentUser?.username || 'User'}</h1>
+            <p className="member-since">
+              <BookOpen size={16} />
+              Member sejak {currentUser?.createdAt ? new Date(currentUser.createdAt).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : 'N/A'}
+            </p>
+          </div>
+
+          <button 
+            className="logout-btn"
+            onClick={handleLogout}
+            title="Logout dari akun Anda"
+          >
+            <LogOut size={20} />
+          </button>
+        </div>
+
+        {/* User Details */}
+        <div className="profile-details">
+          <div className="detail-item">
+            <Mail size={18} />
+            <div>
+              <label>Email</label>
+              <p>{currentUser?.email || '-'}</p>
+            </div>
+          </div>
+
+          <div className="detail-item">
+            <User size={18} />
+            <div>
+              <label>Nama</label>
+              <p>{currentUser?.name || currentUser?.username || '-'}</p>
+            </div>
+          </div>
+
+          <div className="detail-item">
+            <Award size={18} />
+            <div>
+              <label>Status</label>
+              <p className="status-badge">Peserta Voting Aktif</p>
+            </div>
           </div>
         </div>
-      </footer>
+
+        {/* Messages */}
+        {uploadError && (
+          <div className="alert alert-error">
+            {uploadError}
+          </div>
+        )}
+        {uploadSuccess && (
+          <div className="alert alert-success">
+            {uploadSuccess}
+          </div>
+        )}
+
+        {/* Voting History Section */}
+        <div className="voting-history-section">
+          <h2>
+            <Award size={20} /> Riwayat Voting
+          </h2>
+
+          {loadingHistory && (
+            <div className="loading-spinner">
+              <p>⏳ Mengambil riwayat voting dari blockchain...</p>
+            </div>
+          )}
+
+          {historyError && (
+            <div className="alert alert-error">
+              <p>❌ {historyError}</p>
+              <small>Pastikan MetaMask terinstall dan wallet terkoneksi ke Sepolia testnet</small>
+            </div>
+          )}
+
+          {!loadingHistory && votingHistory.length > 0 ? (
+            <div className="voting-history-list">
+              {votingHistory.map((entry, index) => (
+                <div key={index} className="voting-history-item">
+                  <div className="history-left">
+                    <div className="history-icon">
+                      <Clock size={20} />
+                    </div>
+                    <div className="history-content">
+                      <h4>{entry.event}</h4>
+                      <p className="history-choice">
+                        <strong>Pilihan:</strong> {entry.candidateName}
+                      </p>
+                      <small className="history-date">{entry.date}</small>
+                    </div>
+                  </div>
+                  <div className={`history-status status-${entry.status.toLowerCase()}`}>
+                    ✓ {entry.status}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            !loadingHistory && (
+              <div className="empty-history">
+                <p>📭 Belum ada riwayat voting</p>
+                <small>Mulai voting sekarang untuk melihat riwayat Anda</small>
+              </div>
+            )
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -28,6 +28,16 @@ function App() {
     }
   });
 
+  // ===== BARU: State Login Global =====
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      return storedUser && storedUser.token ? true : false;
+    } catch {
+      return false;
+    }
+  });
+
   // Persist user ke localStorage setiap kali user berubah
   useEffect(() => {
     if (user) {
@@ -74,6 +84,23 @@ function App() {
   const handleResetPopup = () => {
     setShowSuccessPopup(false);
   };
+
+  // ===== HANDLER LOGIN SUCCESS =====
+  const handleLoginSuccess = useCallback(() => {
+    console.log("✅ Login success - setting isLoggedIn to true");
+    setIsLoggedIn(true);
+  }, []);
+
+  // ===== HANDLER LOGOUT =====
+  const handleLogoutGlobal = useCallback(() => {
+    console.log("🚪 Logout - clearing user and isLoggedIn");
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null);
+    setIsLoggedIn(false);
+    setCurrentPage("home");
+    window.location.hash = '';
+  }, []);
 
   // Callback untuk update user state
   const handleSetUser = useCallback((userData) => {
@@ -129,25 +156,41 @@ function App() {
       {currentPage === "ukmdetail" && <UkmDetail onNavigate={handleNavigate} ukmName={selectedUkm} user={user} onAuth={handleSetUser} />}
       {currentPage === "result" && <Result onNavigate={handleNavigate} ukmName={selectedUkm} user={user} onAuth={handleSetUser} />} 
       {currentPage === "help" && <Help onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
-      {currentPage === "profile" && <Profile onNavigate={handleNavigate} user={user} onAuth={handleSetUser} />}
+      
+      {/* ===== UPDATE: Teruskan isLoggedIn dan onLogout ke Profile ===== */}
+      {currentPage === "profile" && (
+        <Profile 
+          onNavigate={handleNavigate} 
+          user={user} 
+          onAuth={handleSetUser}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogoutGlobal}
+        />
+      )}
+      
       {currentPage === "voteconfirmation" && candidateData && (
         <VoteConfirmation onNavigate={handleNavigate} candidateData={candidateData} />
       )}
 
+      {/* ===== UPDATE: Teruskan onLoginSuccess ke SignIn ===== */}
       {currentPage === "signin" && (
         <SignIn
           onSwitchToSignUp={() => handleNavigate("signup")}
           onBack={() => handleNavigate("home")}
           onNavigate={handleNavigate}
           onAuth={handleSetUser}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
+
+      {/* ===== UPDATE: Teruskan onLoginSuccess ke SignUp ===== */}
       {currentPage === "signup" && (
         <SignUp
           onSwitchToSignIn={() => handleNavigate("signin")}
           onBack={() => handleNavigate("home")}
           onNavigate={handleNavigate}
           onAuth={handleSetUser}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
     </div>

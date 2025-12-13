@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Check, X, ArrowLeft } from "lucide-react";
 import "./SignIn.css";
 
-function SignUp({ onSwitchToSignIn, onBack, onNavigate, onAuth }) {
+function SignUp({ onSwitchToSignIn, onBack, onNavigate, onAuth, onLoginSuccess }) {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -99,6 +99,12 @@ function SignUp({ onSwitchToSignIn, onBack, onNavigate, onAuth }) {
       if (onAuth) {
         console.log('Calling onAuth with user:', user);
         onAuth(user);
+      }
+
+      // ===== PANGGIL onLoginSuccess (PENTING) =====
+      if (onLoginSuccess) {
+        console.log('🎉 Calling onLoginSuccess callback');
+        onLoginSuccess();
       }
 
       // Tampilkan popup sukses

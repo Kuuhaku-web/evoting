@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './SignIn.css'; 
 
-// --- PERBAIKAN 1: Tambahkan onNavigate di sini ---
-function SignIn({ onSwitchToSignUp, onNavigate, onAuth }) {
+function SignIn({ onSwitchToSignUp, onNavigate, onAuth, onLoginSuccess }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -69,6 +68,12 @@ function SignIn({ onSwitchToSignUp, onNavigate, onAuth }) {
       if (onAuth) {
         console.log('🔄 Calling onAuth with user:', user);
         onAuth(user);
+      }
+
+      // ===== PANGGIL onLoginSuccess (PENTING) =====
+      if (onLoginSuccess) {
+        console.log('🎉 Calling onLoginSuccess callback');
+        onLoginSuccess();
       }
 
       // Wait sedikit kemudian navigasi agar state terupdate
