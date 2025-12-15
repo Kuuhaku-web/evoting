@@ -12,7 +12,7 @@ const app = express();
 
 // CORS
 app.use(cors({ origin: true, credentials: true }));
-app.options('*', cors());
+// app.options('*') tidak support di Express 5; cors() middleware udah handle preflight
 app.use(express.json());
 
 // Routes
