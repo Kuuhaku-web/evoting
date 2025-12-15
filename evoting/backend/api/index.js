@@ -20,6 +20,7 @@ if (!fs.existsSync(uploadDir)) {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
@@ -30,33 +31,37 @@ app.get('/', (req, res) => {
   res.status(200).json({ message: 'Backend is running', status: 'ok' });
 });
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found', path: req.path });
+});
+
 // MongoDB Connection
+let mongoConnected = false;
+
 const connectMongoDB = async () => {
   try {
+    console.log('Attempting to connect to MongoDB...');
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/evoting', {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       retryWrites: true,
       w: 'majority'
     });
-    console.log('MongoDB connected');
+    mongoConnected = true;
+    console.log('MongoDB connected successfully');
     return true;
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
+    mongoConnected = false;
     return false;
   }
 };
 
-// Connect on startup (for local development)
-if (!process.env.VERCEL) {
-  connectMongoDB();
-}
-
-// For Vercel serverless, ensure connection on first request
-let mongoConnected = false;
+// Middleware untuk ensure MongoDB connected (untuk setiap request)
 app.use(async (req, res, next) => {
-  if (!mongoConnected && !process.env.VERCEL) {
-    mongoConnected = await connectMongoDB();
+  if (!mongoConnected) {
+    await connectMongoDB();
   }
   next();
 });
