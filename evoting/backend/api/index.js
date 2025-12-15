@@ -6,8 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const authRoutes = require('../routes/auth');
 
-// Load .env from backend directory
-// Only load locally; Vercel injects env vars directly into process.env
+// Only load .env locally; Vercel injects env vars directly into process.env
 if (!process.env.VERCEL) {
   dotenv.config({ path: path.join(__dirname, '../.env') });
 }
@@ -27,66 +26,36 @@ try {
 }
 process.env.UPLOAD_DIR = uploadDir;
 
-// Middleware
-// Izinkan semua origin localhost dan semua subdomain vercel.app
+// Basic CORS
 const corsOptions = {
-  origin: function (origin, callback) {
-    try {
-      if (!origin) return callback(null, true);
-
-      const isLocalhost = origin.startsWith('http://localhost:3000') || origin.startsWith('http://127.0.0.1:3000') || origin.startsWith('https://localhost:3000');
-      const isVercel = /https?:\/\/([^.]+\.)*vercel\.app$/i.test(origin);
-
-      if (isLocalhost || isVercel) {
-        return callback(null, true);
-      }
-    } catch (e) {
-      // Jika parsing gagal, tolak secara aman
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://localhost:3000'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   optionsSuccessStatus: 204
 };
 
-// Attach common CORS headers so browsers see them
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  next();
+// Add vercel.app domains
+corsOptions.origin.push(function (origin, callback) {
+  if (!origin || origin.includes('.vercel.app')) {
+    callback(null, true);
+  } else {
+    callback(null, corsOptions.origin.includes(origin));
+  }
 });
 
 app.use(cors(corsOptions));
-
-// Explicit preflight: respond with 204 and echo origin when allowed
-app.options('*', (req, res) => {
-  const origin = req.headers.origin || '';
-  const allowed = origin && (origin.endsWith('.vercel.app') || origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000' || origin === 'https://localhost:3000');
-  if (allowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  return res.status(204).end();
-});
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(uploadDir));
 
-// MongoDB Connection with caching (serverless-friendly)
+// MongoDB Connection (cached)
 let mongoConnected = false;
-
 const connectMongoDB = async () => {
   try {
     if (mongoose.connection.readyState === 1) {
-      mongoConnected = true;
       return true;
     }
-    console.log('Attempting to connect to MongoDB...');
+    console.log('[MongoDB] Attempting connection...');
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/evoting', {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
@@ -94,63 +63,49 @@ const connectMongoDB = async () => {
       w: 'majority'
     });
     mongoConnected = true;
-    console.log('MongoDB connected successfully');
+    console.log('[MongoDB] Connected');
     return true;
   } catch (err) {
-    console.error('MongoDB connection error:', err.message);
-    mongoConnected = false;
+    console.error('[MongoDB] Error:', err.message);
     return false;
   }
 };
 
-// Routes dengan automatic DB connection sebelum handler
+// Simple health check (no DB required)
+app.get('/', (req, res) => {
+  res.json({ message: 'Backend is running', status: 'ok' });
+});
+
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.get('/favicon.png', (req, res) => res.status(204).end());
+
+// Ping (show env loaded)
+app.get('/api/ping', (req, res) => {
+  res.json({
+    ok: true,
+    mongoUri: !!process.env.MONGODB_URI,
+    jwtSecret: !!process.env.JWT_SECRET,
+    vercelEnv: !!process.env.VERCEL
+  });
+});
+
+// API routes with DB connection
 app.use('/api/auth', async (req, res, next) => {
-  if (!mongoConnected) {
-    await connectMongoDB();
+  if (!mongoConnected && !await connectMongoDB()) {
+    return res.status(500).json({ error: 'Database unavailable' });
   }
   next();
 }, authRoutes);
 
-app.get('/api/auth', (req, res) => res.status(404).json({ error: 'Use /api/auth/login or /api/auth/register' }));
-
-// Lightweight ping that doesn't touch DB
-app.get('/api/ping', (req, res) => {
-  res.status(200).json({ ok: true, env: {
-    hasMongoUri: Boolean(process.env.MONGODB_URI),
-    hasJwtSecret: Boolean(process.env.JWT_SECRET)
-  } });
-});
-
-// Root health check
-app.get('/', (req, res) => {
-  const origin = req.headers.origin;
-  if (origin && (/https?:\/\/([^.]+\.)*vercel\.app$/i.test(origin) || origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000' || origin === 'https://localhost:3000')) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.status(200).json({ message: 'Backend is running', status: 'ok' });
-});
-
-// Prevent favicon 500s
-app.get('/favicon.ico', (req, res) => res.status(204).end());
-app.get('/favicon.png', (req, res) => res.status(204).end());
-
-// 404 handler (keep last)
+// Catch-all 404
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found', path: req.path });
+  res.status(404).json({ error: 'Not found' });
 });
 
-// Basic error handler to surface stack traces in logs
+// Error handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
-
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason);
-});
-
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+  console.error('[Error]', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 module.exports = app;
