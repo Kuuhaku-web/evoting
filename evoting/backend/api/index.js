@@ -11,11 +11,18 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 
-// Create uploads folder jika belum ada
-const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+// Create uploads folder (use /tmp on Vercel serverless)
+const uploadDir = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '../uploads');
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (_) {
+  // Ignore failures on read-only FS
 }
+process.env.UPLOAD_DIR = uploadDir;
 
 // Middleware
 // Izinkan semua origin localhost dan semua subdomain vercel.app
@@ -45,7 +52,7 @@ app.use(cors(corsOptions));
 app.options('*', cors(corsOptions)); // Handle preflight requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(uploadDir));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -60,11 +67,15 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found', path: req.path });
 });
 
-// MongoDB Connection
+// MongoDB Connection with caching (serverless-friendly)
 let mongoConnected = false;
 
 const connectMongoDB = async () => {
   try {
+    if (mongoose.connection.readyState === 1) {
+      mongoConnected = true;
+      return true;
+    }
     console.log('Attempting to connect to MongoDB...');
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/evoting', {
       serverSelectionTimeoutMS: 5000,
