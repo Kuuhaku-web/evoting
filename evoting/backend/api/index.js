@@ -7,7 +7,10 @@ const fs = require('fs');
 const authRoutes = require('../routes/auth');
 
 // Load .env from backend directory
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// Only load locally; Vercel injects env vars directly into process.env
+if (!process.env.VERCEL) {
+  dotenv.config({ path: path.join(__dirname, '../.env') });
+}
 
 const app = express();
 
@@ -110,6 +113,14 @@ app.use('/api', async (req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+
+// Lightweight ping that doesn't touch DB
+app.get('/api/ping', (req, res) => {
+  res.status(200).json({ ok: true, env: {
+    hasMongoUri: Boolean(process.env.MONGODB_URI),
+    hasJwtSecret: Boolean(process.env.JWT_SECRET)
+  } });
+});
 
 // Root health check
 app.get('/', (req, res) => {
