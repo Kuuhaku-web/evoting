@@ -147,9 +147,9 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('profilePicture', file);
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/users/upload-profile`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/upload-profile`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -160,7 +160,7 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
       if (!response.ok) throw new Error('Upload failed');
 
       const data = await response.json();
-      const newProfileUrl = data.profilePictureUrl;
+      const newProfileUrl = data.profilePicture;
       setProfilePicture(newProfileUrl);
       setUploadSuccess('Foto profil berhasil diperbarui!');
 
