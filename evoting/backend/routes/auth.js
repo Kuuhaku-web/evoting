@@ -8,19 +8,9 @@ const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-// Multer config for profile picture upload
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = process.env.UPLOAD_DIR || 'uploads/';
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
+// Multer config for profile picture upload (in memory for Base64 storage)
 const upload = multer({ 
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif/;
@@ -147,18 +137,19 @@ router.post('/upload-profile', authMiddleware, upload.single('profilePicture'), 
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    console.log('[Upload] File uploaded:', req.file.filename, 'UPLOAD_DIR:', process.env.UPLOAD_DIR);
-    
-    // Relative URL for frontend
-    const profilePictureUrl = `/uploads/${req.file.filename}`;
+    // Convert file buffer to Base64
+    const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
+    console.log('[Upload] File converted to Base64, size:', base64Image.length, 'bytes');
+    
+    // Save Base64 directly to MongoDB
     await User.findByIdAndUpdate(req.userId, {
-      profilePicture: profilePictureUrl
+      profilePicture: base64Image
     });
 
     res.json({
       message: 'Profile picture uploaded successfully',
-      profilePicture: profilePictureUrl
+      profilePicture: base64Image
     });
   } catch (error) {
     console.error('[Upload Error]', error);
