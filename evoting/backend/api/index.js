@@ -74,26 +74,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(uploadDir));
 
-// Routes
-app.use('/api/auth', authRoutes);
-
-// Root health check
-app.get('/', (req, res) => {
-  const origin = req.headers.origin;
-  if (origin && (/https?:\/\/([^.]+\.)*vercel\.app$/i.test(origin) || origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000' || origin === 'https://localhost:3000')) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  res.status(200).json({ message: 'Backend is running', status: 'ok' });
-});
-
-// Prevent favicon 500s
-app.get('/favicon.ico', (req, res) => res.status(204).end());
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found', path: req.path });
-});
-
 // MongoDB Connection with caching (serverless-friendly)
 let mongoConnected = false;
 
@@ -120,12 +100,47 @@ const connectMongoDB = async () => {
   }
 };
 
-// Middleware untuk ensure MongoDB connected (untuk setiap request)
-app.use(async (req, res, next) => {
+// Ensure DB connection before hitting API routes only
+app.use('/api', async (req, res, next) => {
   if (!mongoConnected) {
     await connectMongoDB();
   }
   next();
+});
+
+// Routes
+app.use('/api/auth', authRoutes);
+
+// Root health check
+app.get('/', (req, res) => {
+  const origin = req.headers.origin;
+  if (origin && (/https?:\/\/([^.]+\.)*vercel\.app$/i.test(origin) || origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000' || origin === 'https://localhost:3000')) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.status(200).json({ message: 'Backend is running', status: 'ok' });
+});
+
+// Prevent favicon 500s
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.get('/favicon.png', (req, res) => res.status(204).end());
+
+// 404 handler (keep last)
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found', path: req.path });
+});
+
+// Basic error handler to surface stack traces in logs
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
 });
 
 module.exports = app;
