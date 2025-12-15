@@ -26,7 +26,8 @@ function SignIn({ onSwitchToSignUp, onNavigate, onAuth, onLoginSuccess }) {
     try {
       console.log('🔐 Starting login with:', formData);
       
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const API_URL = process.env.REACT_APP_API_URL || 'https://evoting-git-main-edwins-projects-0fa94835.vercel.app';
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
