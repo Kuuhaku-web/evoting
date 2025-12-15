@@ -31,7 +31,7 @@ const corsOptions = {
     try {
       if (!origin) return callback(null, true);
 
-      const isLocalhost = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
+      const isLocalhost = origin.startsWith('http://localhost:3000') || origin.startsWith('http://127.0.0.1:3000') || origin.startsWith('https://localhost:3000');
       const isVercel = /https?:\/\/([^.]+\.)*vercel\.app$/i.test(origin);
 
       if (isLocalhost || isVercel) {
@@ -45,11 +45,31 @@ const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 204
 };
 
+// Attach common CORS headers so browsers see them
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  next();
+});
+
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight requests
+
+// Explicit preflight: respond with 204 and echo origin when allowed
+app.options('*', (req, res) => {
+  const origin = req.headers.origin || '';
+  const allowed = origin && (origin.endsWith('.vercel.app') || origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000' || origin === 'https://localhost:3000');
+  if (allowed) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  return res.status(204).end();
+});
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(uploadDir));
@@ -59,8 +79,15 @@ app.use('/api/auth', authRoutes);
 
 // Root health check
 app.get('/', (req, res) => {
+  const origin = req.headers.origin;
+  if (origin && (/https?:\/\/([^.]+\.)*vercel\.app$/i.test(origin) || origin === 'http://localhost:3000' || origin === 'http://127.0.0.1:3000' || origin === 'https://localhost:3000')) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.status(200).json({ message: 'Backend is running', status: 'ok' });
 });
+
+// Prevent favicon 500s
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // 404 handler
 app.use((req, res) => {
