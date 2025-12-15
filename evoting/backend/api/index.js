@@ -18,7 +18,29 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'https://evoting-iota.vercel.app',
+      'https://evoting-git-main-edwins-projects-0fa94835.vercel.app',
+      'https://evoting-6e3ssq38e-edwins-projects-0fa94835.vercel.app'
+    ];
+    
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
