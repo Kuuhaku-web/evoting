@@ -147,6 +147,9 @@ router.post('/upload-profile', authMiddleware, upload.single('profilePicture'), 
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
+    console.log('[Upload] File uploaded:', req.file.filename, 'UPLOAD_DIR:', process.env.UPLOAD_DIR);
+    
+    // Relative URL for frontend
     const profilePictureUrl = `/uploads/${req.file.filename}`;
 
     await User.findByIdAndUpdate(req.userId, {
@@ -158,8 +161,8 @@ router.post('/upload-profile', authMiddleware, upload.single('profilePicture'), 
       profilePicture: profilePictureUrl
     });
   } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('[Upload Error]', error);
+    res.status(500).json({ message: 'Server error during upload' });
   }
 });
 
