@@ -103,16 +103,15 @@ const connectMongoDB = async () => {
   }
 };
 
-// Ensure DB connection before hitting API routes only
-app.use('/api', async (req, res, next) => {
+// Routes dengan automatic DB connection sebelum handler
+app.use('/api/auth', async (req, res, next) => {
   if (!mongoConnected) {
     await connectMongoDB();
   }
   next();
-});
+}, authRoutes);
 
-// Routes
-app.use('/api/auth', authRoutes);
+app.get('/api/auth', (req, res) => res.status(404).json({ error: 'Use /api/auth/login or /api/auth/register' }));
 
 // Lightweight ping that doesn't touch DB
 app.get('/api/ping', (req, res) => {
