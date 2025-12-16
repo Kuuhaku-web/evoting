@@ -70,47 +70,67 @@ function Result({ onNavigate, ukmName, user, onAuth }) {
 
         console.log(`✅ Category ID untuk "${ukmName}": ${categoryId}`);
 
-        // ===== STEP 2: Call getCategoryResults untuk mendapatkan data kandidat =====
+        // ===== STEP 2: Ambil Data Kandidat & Filter Yang Aktif =====
         console.log(`📡 Mengambil hasil kategori ${categoryId}...`);
+        
+        // Ambil data mentah (termasuk yang tidak aktif)
         const [candidateIds, voteCounts, names] = await contract.getCategoryResults(categoryId);
 
-        console.log(`✅ Total kandidat: ${candidateIds.length}`);
-        console.log("Candidate IDs:", candidateIds.map(id => id.toString()));
-        console.log("Vote Counts:", voteCounts.map(v => v.toString()));
-        console.log("Names:", names);
+        let finalCandidates = [];
+        let calculatedTotalVotes = 0;
 
-        // ===== STEP 3: Kalkulasi total votes =====
-        let totalVotesNumber = 0;
-        for (const voteCount of voteCounts) {
-          totalVotesNumber += Number(voteCount);
+        // Loop setiap kandidat untuk cek status AKTIF/TIDAK
+        for (let i = 0; i < candidateIds.length; i++) {
+          const id = candidateIds[i];
+          const rawVote = voteCounts[i];
+          const name = names[i];
+
+          // PANGGIL FUNGSI getCandidate UNTUK CEK STATUS
+          const candidateData = await contract.getCandidate(id);
+          
+          // Cek isActive (Biasanya di index terakhir atau properti .isActive)
+          // Kita coba akses properti .isActive, jika undefined pakai index manual
+          const isActive = candidateData.isActive; 
+
+          // LOGIKA FILTER: Hanya masukkan jika isActive == true
+          if (isActive) {
+             const votesNumber = Number(rawVote);
+             calculatedTotalVotes += votesNumber;
+
+             finalCandidates.push({
+                id: Number(id),
+                name: name,
+                votesNumber: votesNumber,
+                votes: votesNumber.toLocaleString('id-ID'),
+                // Assign warna sementara (nanti di-map ulang)
+                color: COLORS[0] 
+             });
+          } else {
+             console.log(`🗑️ Kandidat ID ${id} (${name}) tidak aktif, disembunyikan.`);
+          }
         }
 
-        console.log(`✅ Total Votes: ${totalVotesNumber}`);
+        console.log(`✅ Total Votes (Aktif Saja): ${calculatedTotalVotes}`);
 
-        // ===== STEP 4: Build kandidat array dengan percentage =====
-        const candidatesData = names.map((name, index) => {
-          const votes = Number(voteCounts[index]);
-          const percentage = totalVotesNumber > 0 ? (votes / totalVotesNumber) * 100 : 0;
-
-          return {
-            id: Number(candidateIds[index]),
-            name: name,
-            role: "Kandidat",
-            votes: votes.toLocaleString('id-ID'),
-            votesNumber: votes,
-            percentage: Math.round(percentage * 10) / 10, // Round to 1 decimal
-            color: COLORS[index % COLORS.length]
-          };
+        // ===== STEP 3: Hitung Persentase & Rapikan Data =====
+        const processedData = finalCandidates.map((c, index) => {
+           const percentage = calculatedTotalVotes > 0 
+              ? (c.votesNumber / calculatedTotalVotes) * 100 
+              : 0;
+           
+           return {
+              ...c,
+              role: "Kandidat",
+              percentage: Math.round(percentage * 10) / 10,
+              color: COLORS[index % COLORS.length] // Warna urut sesuai yang tampil
+           };
         });
 
-        // Sort by votes descending
-        candidatesData.sort((a, b) => b.votesNumber - a.votesNumber);
+        // Sort by votes descending (Terbanyak di atas)
+        processedData.sort((a, b) => b.votesNumber - a.votesNumber);
 
-        setCandidates(candidatesData);
-        setTotalVotes(totalVotesNumber.toLocaleString('id-ID'));
-
-        console.log("✅ Candidates data loaded:", candidatesData);
-
+        setCandidates(processedData);
+        setTotalVotes(calculatedTotalVotes.toLocaleString('id-ID'));
       } catch (err) {
         console.error("❌ Error fetching candidate results:", err);
         setError(err.message || "Gagal mengambil data voting");
