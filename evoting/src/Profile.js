@@ -64,10 +64,38 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
         const walletAddress = accounts[0];
 
         // Setup provider
-        const provider = new BrowserProvider(window.ethereum);
-        // const signer = await provider.getSigner(); // Tidak perlu getSigner hanya untuk read
-        const contract = new Contract(CONTRACT_ADDRESS, BinusUKMVotingABI, provider);
+        // 1. Setup Provider Awal
+      const provider = new BrowserProvider(window.ethereum);
+      
+      // 2. === PAKSA PINDAH KE SEPOLIA (FIX NETWORK ID 1) ===
+      const network = await provider.getNetwork();
+      console.log("🔥 NETWORK SEBELUMNYA:", network.chainId.toString());
 
+      let validProvider = provider; // Siapkan variabel provider yang valid
+
+      // Jika jaringan bukan Sepolia (11155111), paksa pindah
+      if (network.chainId.toString() !== "11155111") {
+          try {
+              await window.ethereum.request({
+                  method: 'wallet_switchEthereumChain',
+                  params: [{ chainId: '0xaa36a7' }], // Hex code untuk 11155111
+              });
+              
+              // Refresh provider setelah switch supaya update data networknya
+              validProvider = new BrowserProvider(window.ethereum);
+          } catch (switchError) {
+              // Error 4902 artinya Sepolia belum ditambahkan di MetaMask user
+              if (switchError.code === 4902) {
+                  console.error("Sepolia belum ada di MetaMask user");
+              }
+              throw switchError;
+          }
+      } 
+      // =====================================================
+
+      // 3. Gunakan 'validProvider' (YANG SUDAH BENAR) untuk bikin kontrak
+      // Pastikan TANPA '.abi' jika file JSON kamu isinya langsung Array
+      const contract = new Contract(CONTRACT_ADDRESS, BinusUKMVotingABI, validProvider);
         console.log("✅ Connected to MetaMask");
         console.log("📍 Wallet Address:", walletAddress);
 
