@@ -55,10 +55,17 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
           throw new Error("MetaMask tidak terdeteksi. Silakan install MetaMask untuk melihat riwayat voting.");
         }
 
+        // Cek apakah wallet sudah terkoneksi
+        let accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (!accounts || accounts.length === 0) {
+          // Hanya request jika belum terkoneksi
+          accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        }
+        const walletAddress = accounts[0];
+
         // Setup provider
         const provider = new BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const walletAddress = await signer.getAddress();
+        // const signer = await provider.getSigner(); // Tidak perlu getSigner hanya untuk read
         const contract = new Contract(CONTRACT_ADDRESS, BinusUKMVotingABI, provider);
 
         console.log("✅ Connected to MetaMask");
