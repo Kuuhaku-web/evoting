@@ -152,12 +152,19 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
         console.log("✅ Voting history loaded:", history);
         setVotingHistory(history);
 
+      // ✅ PASTE KODE BARU INI DISITU
       } catch (err) {
-        console.error("❌ Error fetching voting history:", err);
-        setHistoryError(err.message || "Gagal mengambil riwayat voting");
-      } finally {
-        setLoadingHistory(false);
+      // Abaikan error merah jika cuma antrian MetaMask
+      if (err.code === -32002 || (err.message && err.message.includes("already pending"))) {
+      console.log("⚠️ Mengabaikan error pending MetaMask (Aman)");
+      return; 
       }
+  
+  console.error("❌ Error fetching voting history:", err);
+  setHistoryError(err.message || "Gagal mengambil riwayat voting");
+} finally {
+  setLoadingHistory(false);
+}
     };
 
     fetchVotingHistory();
