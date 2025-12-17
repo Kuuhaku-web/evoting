@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Mail, BookOpen, Clock, LogOut, Award, Upload, UserCircle } from "lucide-react";
+import { User, Mail, BookOpen, Clock, LogOut, Award, Upload, UserCircle, Trash2 } from "lucide-react";
 import { BrowserProvider, Contract } from "ethers";
 import "./Profile.css";
 import BinusUKMVotingABI from "./utils/BinusUKMVoting.json";
@@ -27,6 +27,8 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
   const [votingHistory, setVotingHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Watch for user prop changes
   useEffect(() => {
@@ -179,6 +181,52 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
     }
   };
 
+  // ===== HANDLE DELETE PROFILE =====
+  const handleDeleteProfile = async () => {
+    try {
+      setDeleteLoading(true);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token not found');
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/delete-profile`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Gagal menghapus profil');
+      }
+
+      // Clear localStorage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      // Call logout callback
+      if (onLogout) {
+        onLogout();
+      }
+
+      // Redirect to home
+      if (onNavigate) {
+        onNavigate('home');
+      }
+
+      setShowDeleteModal(false);
+    } catch (err) {
+      console.error('Delete profile error:', err);
+      alert('Error: ' + err.message);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleProfilePictureChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -295,6 +343,18 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
           >
             <LogOut size={20} />
           </button>
+
+          <button 
+            className="delete-btn"
+            onClick={() => setShowDeleteModal(true)}
+            title="Hapus profil Anda"
+            style={{
+              backgroundColor: '#dc2626',
+              marginLeft: '0.5rem'
+            }}
+          >
+            <Trash2 size={20} />
+          </button>
         </div>
 
         {/* User Details */}
@@ -387,6 +447,38 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
           )}
         </div>
       </div>
+
+      {/* Delete Profile Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay" onClick={() => !deleteLoading && setShowDeleteModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>⚠️ Hapus Profil</h2>
+            <p style={{ marginBottom: '1rem', color: '#666' }}>
+              Anda yakin ingin menghapus profil Anda? Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div className="modal-actions">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteLoading}
+              >
+                Batal
+              </button>
+              <button 
+                className="btn btn-danger"
+                onClick={handleDeleteProfile}
+                disabled={deleteLoading}
+                style={{
+                  backgroundColor: '#dc2626',
+                  color: 'white'
+                }}
+              >
+                {deleteLoading ? '⏳ Menghapus...' : '🗑️ Hapus Profil'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

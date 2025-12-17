@@ -191,4 +191,21 @@ router.post('/link-wallet', authMiddleware, async (req, res) => {
   }
 });
 
+// Delete entire user profile
+router.delete('/delete-profile', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    // Delete user from database
+    await User.findByIdAndDelete(userId);
+
+    res.json({
+      message: 'Profile deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete profile error:', error);
+    res.status(500).json({ message: 'Server error while deleting profile' });
+  }
+});
+
 module.exports = router;
