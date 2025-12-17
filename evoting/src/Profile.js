@@ -27,7 +27,6 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
   const [votingHistory, setVotingHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyError, setHistoryError] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Watch for user prop changes
@@ -181,8 +180,8 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
     }
   };
 
-  // ===== HANDLE DELETE PROFILE =====
-  const handleDeleteProfile = async () => {
+  // ===== HANDLE DELETE PROFILE PICTURE =====
+  const handleDeleteProfilePicture = async () => {
     try {
       setDeleteLoading(true);
 
@@ -191,8 +190,8 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
         throw new Error('Token not found');
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/delete-profile`, {
-        method: 'DELETE',
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/delete-profile-picture`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -200,34 +199,16 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Gagal menghapus profil');
+        throw new Error('Gagal menghapus foto profil');
       }
 
-      // Show success message
-      alert('✅ Profil Anda berhasil dihapus. Anda akan logout dan diarahkan ke halaman utama.');
-
-      // Delay 1.5 detik sebelum logout
-      setTimeout(() => {
-        // Clear localStorage
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-
-        // Call logout callback
-        if (onLogout) {
-          onLogout();
-        }
-
-        // Redirect to home
-        if (onNavigate) {
-          onNavigate('home');
-        }
-      }, 1500);
-
-      setShowDeleteModal(false);
+      setProfilePicture(null);
+      setUploadSuccess('Foto profil berhasil dihapus!');
+      setTimeout(() => setUploadSuccess(''), 3000);
     } catch (err) {
-      console.error('Delete profile error:', err);
-      alert('❌ Error: ' + err.message);
+      console.error('Delete picture error:', err);
+      setUploadError(err.message || 'Gagal menghapus foto profil');
+      setTimeout(() => setUploadError(''), 3000);
     } finally {
       setDeleteLoading(false);
     }
@@ -345,6 +326,17 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
                 style={{ display: 'none' }}
               />
             </label>
+
+            {profilePicture && (
+              <button 
+                className="picture-delete-btn"
+                onClick={handleDeleteProfilePicture}
+                disabled={deleteLoading}
+                title="Hapus foto profil"
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
           </div>
 
           <div className="profile-info">
@@ -361,18 +353,6 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
             title="Logout dari akun Anda"
           >
             <LogOut size={20} />
-          </button>
-
-          <button 
-            className="delete-btn"
-            onClick={() => setShowDeleteModal(true)}
-            title="Hapus profil Anda"
-            style={{
-              backgroundColor: '#dc2626',
-              marginLeft: '0.5rem'
-            }}
-          >
-            <Trash2 size={20} />
           </button>
         </div>
 
@@ -467,37 +447,6 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
         </div>
       </div>
 
-      {/* Delete Profile Modal */}
-      {showDeleteModal && (
-        <div className="modal-overlay" onClick={() => !deleteLoading && setShowDeleteModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2 style={{ color: '#dc2626', marginBottom: '1rem' }}>⚠️ Hapus Profil</h2>
-            <p style={{ marginBottom: '1rem', color: '#666' }}>
-              Anda yakin ingin menghapus profil Anda? Tindakan ini tidak dapat dibatalkan.
-            </p>
-            <div className="modal-actions">
-              <button 
-                className="btn btn-secondary"
-                onClick={() => setShowDeleteModal(false)}
-                disabled={deleteLoading}
-              >
-                Batal
-              </button>
-              <button 
-                className="btn btn-danger"
-                onClick={handleDeleteProfile}
-                disabled={deleteLoading}
-                style={{
-                  backgroundColor: '#dc2626',
-                  color: 'white'
-                }}
-              >
-                {deleteLoading ? '⏳ Menghapus...' : '🗑️ Hapus Profil'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

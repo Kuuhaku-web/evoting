@@ -342,6 +342,34 @@
   background: #d97706;
 }
 
+.picture-delete-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #dc2626;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s;
+  border: 2px solid white;
+  padding: 0;
+  font-size: 0;
+}
+
+.picture-delete-btn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.picture-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .profile-info {
   flex: 1;
 }
