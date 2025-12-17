@@ -204,24 +204,30 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
         throw new Error(errorData.message || 'Gagal menghapus profil');
       }
 
-      // Clear localStorage
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
+      // Show success message
+      alert('✅ Profil Anda berhasil dihapus. Anda akan logout dan diarahkan ke halaman utama.');
 
-      // Call logout callback
-      if (onLogout) {
-        onLogout();
-      }
+      // Delay 1.5 detik sebelum logout
+      setTimeout(() => {
+        // Clear localStorage
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
 
-      // Redirect to home
-      if (onNavigate) {
-        onNavigate('home');
-      }
+        // Call logout callback
+        if (onLogout) {
+          onLogout();
+        }
+
+        // Redirect to home
+        if (onNavigate) {
+          onNavigate('home');
+        }
+      }, 1500);
 
       setShowDeleteModal(false);
     } catch (err) {
       console.error('Delete profile error:', err);
-      alert('Error: ' + err.message);
+      alert('❌ Error: ' + err.message);
     } finally {
       setDeleteLoading(false);
     }
@@ -239,15 +245,28 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
       const formData = new FormData();
       formData.append('profilePicture', file);
 
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token not found. Silakan login kembali.');
+      }
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/upload-profile`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${token}`
         },
         body: formData
       });
 
-      if (!response.ok) throw new Error('Upload failed');
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Session expired. Silakan login kembali.');
+        } else if (response.status === 413) {
+          throw new Error('File terlalu besar. Maksimal 5MB.');
+        } else {
+          throw new Error('Upload failed');
+        }
+      }
 
       const data = await response.json();
       const newProfileUrl = data.profilePicture;
@@ -257,7 +276,7 @@ function Profile({ onNavigate, user, onAuth, isLoggedIn, onLogout }) {
       setTimeout(() => setUploadSuccess(''), 3000);
     } catch (err) {
       console.error('Upload error:', err);
-      setUploadError('Gagal mengupload foto profil');
+      setUploadError(err.message || 'Gagal mengupload foto profil');
       setTimeout(() => setUploadError(''), 3000);
     } finally {
       setUploadLoading(false);
