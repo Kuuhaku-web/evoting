@@ -153,7 +153,7 @@ function Home({ onNavigate, user, onAuth }) {
               Welcome to the official E-Voting platform for student activity units. Participate in your UKM's governance with a secure, transparent, and easy-to-use system. Make your voice heard, help build a better community, and lead the
               change you want to see.
             </p>
-            <button className="cta-btn">View Elections</button>
+            <button className="cta-btn" onClick={() => onNavigate("election")}>View Elections</button>
           </div>
         </div>
       </section>
